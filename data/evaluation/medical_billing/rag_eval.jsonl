@@ -1,0 +1,5 @@
+{"id":"modifier_25","domain":"medical_billing","query":"When should modifier 25 be used?","expected_terms":["modifier","25","separately identifiable","evaluation"],"expected_source_ids":["sample_modifier_25"]}
+{"id":"claim_review_99214","domain":"medical_billing","query":"What documentation supports CPT 99214 claim review?","expected_terms":["99214","documentation","medical decision making"],"expected_source_ids":["sample_claim_review"]}
+{"id":"icd10_specificity","domain":"medical_billing","query":"What do ICD-10-CM guidelines say about coding to the highest level of specificity?","expected_terms":["highest level of specificity","medical record documentation"],"expected_source_ids":["icd10cm_guidelines_2026"]}
+{"id":"icd10_sequencing","domain":"medical_billing","query":"What are ICD-10-CM coding guidelines for diagnosis sequencing?","expected_terms":["sequenced","diagnosis","guidelines"],"expected_source_ids":["icd10cm_guidelines_2026"]}
+

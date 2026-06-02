@@ -1,0 +1,9 @@
+embedding_model: local-hashing
+production_embedding_model: BAAI/bge-large-en-v1.5
+chunk_size_tokens: 512
+chunk_overlap_tokens: 80
+vector_store: qdrant
+bm25_enabled: true
+qdrant_url: http://localhost:6333
+dense_vector_size: 384
+

@@ -1,0 +1,15 @@
+POAexemptCode	Description
+Q89.8	Other specified congenital malformations
+Q99.8	Other specified chromosome abnormalities
+S30.1XXD	"Contusion of abdominal wall, subsequent encounter"
+S30.1XXS	"Contusion of abdominal wall, sequela"
+T78.07XD	"Anaphylactic reaction due to milk and dairy products, subsequent encounter"
+T78.07XS	"Anaphylactic reaction due to milk and dairy products, sequela"
+T78.08XD	"Anaphylactic reaction due to eggs, subsequent encounter"
+T78.08XS	"Anaphylactic reaction due to eggs, sequela"
+T78.1XXD	"Other adverse food reactions, not elsewhere classified, subsequent encounter"
+T78.1XXS	"Other adverse food reactions, not elsewhere classified, sequela"
+Z59.86	Financial insecurity
+Z84.1	Family history of disorders of kidney and ureter
+Z91.011	Allergy to milk products
+Z91.012	Allergy to eggs
