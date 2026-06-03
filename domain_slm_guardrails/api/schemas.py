@@ -24,6 +24,7 @@ class GuardrailStatus(BaseModel):
     json_valid: bool = True
     fallback_used: bool = False
     reason: str | None = None
+    critic_score: float | None = None
 
 
 class QueryResponse(BaseModel):
@@ -33,4 +34,3 @@ class QueryResponse(BaseModel):
     citations: list[Citation]
     guardrail_status: GuardrailStatus
     latency_ms: float
-
