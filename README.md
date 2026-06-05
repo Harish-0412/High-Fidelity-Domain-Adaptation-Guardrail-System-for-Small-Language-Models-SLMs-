@@ -73,7 +73,6 @@ Planned:
 - `GroundednessComparator`: measures the real-world impact of alignment using objective grounding metrics and automated reporting.
 
 This pipeline emphasizes DPO as a distinct alignment phase that teaches the model to prefer fact-supported, citation-backed outputs over vague or hallucinated answers while preserving domain knowledge from SFT.
-
 ## Tech Stack
 
 ### Implemented
