@@ -1,0 +1,3 @@
+{"id": "albuterol_dosage", "domain": "medical_prescription", "query": "What is the recommended dosage of albuterol sulfate for acute bronchospasm?", "expected_terms": ["two inhalations", "4 to 6 hours"], "expected_source_ids": ["albuterol"]}
+{"id": "albuterol_exercise", "domain": "medical_prescription", "query": "When should albuterol be used to prevent exercise-induced bronchospasm?", "expected_terms": ["15 to 30 minutes", "before exercise"], "expected_source_ids": ["albuterol"]}
+{"id": "albuterol_age", "domain": "medical_prescription", "query": "What is the minimum age for using albuterol sulfate inhalation aerosol?", "expected_terms": ["4 years"], "expected_source_ids": ["albuterol"]}

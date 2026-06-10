@@ -12,7 +12,7 @@ from domain_slm_guardrails.ingestion.pipeline import run_ingestion
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Ingest raw domain documents into JSONL chunks.")
-    parser.add_argument("--domain", required=True, help="Domain id, for example medical_billing")
+    parser.add_argument("--domain", required=True, help="Domain id, for example medical_prescription")
     args = parser.parse_args()
 
     domain = get_domain_config(args.domain)

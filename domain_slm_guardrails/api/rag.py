@@ -6,7 +6,25 @@ from dataclasses import dataclass, field
 from typing import Sequence
 
 from domain_slm_guardrails.api.schemas import Citation, GuardrailStatus, QueryResponse
+from domain_slm_guardrails.core.domain_registry import get_domain_config
 from domain_slm_guardrails.retrieval.hybrid import HybridResult, load_hybrid_retriever
+from domain_slm_guardrails.critic.enforcer import LiveGuardrailEnforcer
+from domain_slm_guardrails.core.config import load_base_config, project_root
+from pathlib import Path
+
+# Initialize global enforcer
+try:
+    base_cfg = load_base_config()
+    chk_path = base_cfg.get("critic_checkpoint_path")
+    if chk_path:
+        full_chk_path = Path(chk_path)
+        if not full_chk_path.is_absolute():
+            full_chk_path = project_root() / full_chk_path
+        enforcer = LiveGuardrailEnforcer(checkpoint_path=full_chk_path)
+    else:
+        enforcer = LiveGuardrailEnforcer()
+except Exception:
+    enforcer = LiveGuardrailEnforcer()
 
 
 # ---------------------------------------------------------------------------
@@ -39,12 +57,6 @@ SEGMENT_RE = re.compile(
 )
 
 WORD_RE = re.compile(r"[A-Za-z0-9_]+")
-PAGE_HEADER_RE = re.compile(
-    r"^ICD-10-CM Official Guidelines for Coding and Reporting FY \d{4} Page \d+ of \d+$"
-)
-PAGE_HEADER_PREFIX_RE = re.compile(
-    r"^ICD-10-CM Official Guidelines for Coding and Reporting FY \d{4} Page \d+ of \d+\s+"
-)
 
 STOPWORDS: frozenset[str] = frozenset({
     "a", "an", "and", "are", "as", "at", "be", "been", "by", "do", "for",
@@ -54,17 +66,6 @@ STOPWORDS: frozenset[str] = frozenset({
     "than", "that", "the", "their", "them", "then", "there", "these", "they",
     "this", "those", "to", "up", "us", "was", "we", "were", "what", "when",
     "which", "who", "will", "with", "would", "you", "your",
-})
-DOMAIN_GENERIC_TERMS: frozenset[str] = frozenset({
-    "icd",
-    "10",
-    "cm",
-    "guideline",
-    "guidelines",
-    "coding",
-    "code",
-    "codes",
-    "reporting",
 })
 
 # Minimum sentence length (chars) to be considered as a candidate answer sentence
@@ -100,7 +101,7 @@ def _query_terms(query: str) -> set[str]:
     }
 
 
-def _query_ngrams(query: str, min_size: int = 2, max_size: int = 4) -> set[str]:
+def _query_ngrams(query: str, domain_generic_terms: set[str], min_size: int = 2, max_size: int = 4) -> set[str]:
     tokens = [
         t.lower() for t in WORD_RE.findall(query)
         if t.lower() not in STOPWORDS and len(t) > 1
@@ -109,7 +110,7 @@ def _query_ngrams(query: str, min_size: int = 2, max_size: int = 4) -> set[str]:
     for size in range(min_size, max_size + 1):
         for i in range(len(tokens) - size + 1):
             ngram_tokens = tokens[i : i + size]
-            if all(token in DOMAIN_GENERIC_TERMS for token in ngram_tokens):
+            if domain_generic_terms and all(token in domain_generic_terms for token in ngram_tokens):
                 continue
             ngrams.add(" ".join(ngram_tokens))
     return ngrams
@@ -157,6 +158,7 @@ def _score_sentence(
     query_terms: set[str],
     query_ngrams: set[str],
     result_score: float,
+    domain_generic_terms: set[str],
 ) -> float:
     """
     Score a sentence for query relevance.
@@ -171,8 +173,8 @@ def _score_sentence(
     sentence_terms = _query_terms(sentence)
     sentence_lower = sentence.lower()
 
-    important_terms = query_terms - DOMAIN_GENERIC_TERMS
-    generic_terms = query_terms & DOMAIN_GENERIC_TERMS
+    important_terms = query_terms - domain_generic_terms
+    generic_terms = query_terms & domain_generic_terms
     important_overlap = len(important_terms & sentence_terms)
     generic_overlap = len(generic_terms & sentence_terms)
     overlap = important_overlap + generic_overlap
@@ -190,12 +192,16 @@ def _score_sentence(
     )
 
 
-def _is_boilerplate_segment(sentence: str) -> bool:
-    return bool(PAGE_HEADER_RE.match(sentence.strip()))
+def _is_boilerplate_segment(sentence: str, page_header_pattern: str | None) -> bool:
+    if not page_header_pattern:
+        return False
+    return bool(re.match(page_header_pattern, sentence.strip()))
 
 
-def _strip_page_header_prefix(sentence: str) -> str:
-    return PAGE_HEADER_PREFIX_RE.sub("", sentence).strip()
+def _strip_page_header_prefix(sentence: str, page_header_prefix_pattern: str | None) -> str:
+    if not page_header_prefix_pattern:
+        return sentence.strip()
+    return re.sub(page_header_prefix_pattern, "", sentence).strip()
 
 
 def _mmr_select(
@@ -252,6 +258,9 @@ def _best_sentences(
     query: str,
     results: list[HybridResult],
     max_sentences: int,
+    domain_generic_terms: set[str],
+    page_header_pattern: str | None = None,
+    page_header_prefix_pattern: str | None = None,
     use_mmr: bool = True,
     coherence_sort: bool = True,
 ) -> list[str]:
@@ -263,7 +272,7 @@ def _best_sentences(
     3. Optionally re-sort by source order for coherent reading flow.
     """
     q_terms = _query_terms(query)
-    q_ngrams = _query_ngrams(query)
+    q_ngrams = _query_ngrams(query, domain_generic_terms)
 
     candidates: list[_SentenceCandidate] = []
     order = 0
@@ -271,11 +280,11 @@ def _best_sentences(
     for result in results:
         chunk_text = str(result.chunk.get("text", ""))
         for sentence in _split_segments(chunk_text):
-            sentence = _strip_page_header_prefix(sentence.strip())
-            if len(sentence) < _MIN_SENTENCE_LEN or _is_boilerplate_segment(sentence):
+            sentence = _strip_page_header_prefix(sentence.strip(), page_header_prefix_pattern)
+            if len(sentence) < _MIN_SENTENCE_LEN or _is_boilerplate_segment(sentence, page_header_pattern):
                 order += 1
                 continue
-            rel = _score_sentence(sentence, q_terms, q_ngrams, result.score)
+            rel = _score_sentence(sentence, q_terms, q_ngrams, result.score, domain_generic_terms)
             if rel > 0:
                 candidates.append(
                     _SentenceCandidate(
@@ -393,7 +402,7 @@ def answer_query(
     Retrieve evidence and assemble a grounded answer.
 
     Args:
-        domain:         Domain identifier (e.g. "medical_billing").
+        domain:         Domain identifier (e.g. "medical_prescription").
         query:          User's natural-language question.
         top_k:          Number of chunks to retrieve.
         config:         RAGConfig overrides.
@@ -401,6 +410,7 @@ def answer_query(
     """
     started = time.perf_counter()
     config = config or RAGConfig()
+    domain_cfg = get_domain_config(domain)
     retriever = load_hybrid_retriever(domain)
 
     raw_results = retriever.search(query, top_k=top_k, expanded_query=expanded_query)
@@ -435,6 +445,9 @@ def answer_query(
         query,
         results,
         config.max_answer_sentences,
+        domain_generic_terms=domain_cfg.domain_generic_terms,
+        page_header_pattern=domain_cfg.page_header_pattern,
+        page_header_prefix_pattern=domain_cfg.page_header_prefix_pattern,
         use_mmr=config.use_mmr,
         coherence_sort=config.coherence_sort,
     )
@@ -464,7 +477,27 @@ def answer_query(
     top_citation_refs = " ".join(
         f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
     )
-    answer = f"{answer_body} {top_citation_refs}"
+    original_answer = f"{answer_body} {top_citation_refs}"
+
+    # Extract retrieved context to evaluate Jaccard similarity fallback if no tensor
+    retrieved_context = " ".join(str(r.chunk.get("text", "")) for r in results)
+
+    # Score and enforce
+    guard_res = enforcer.score_and_enforce(
+        query=query,
+        retrieved_context=retrieved_context,
+        generated_answer=answer_body,
+        domain=domain,
+    )
+
+    if guard_res["fallback_used"]:
+        answer = "I could not verify this confidently from the available source documents."
+        fallback_used = True
+        reason = guard_res["reason"] or "critic_threshold_crossed"
+    else:
+        answer = original_answer
+        fallback_used = False
+        reason = None
 
     latency_ms = (time.perf_counter() - started) * 1000
     return QueryResponse(
@@ -474,8 +507,9 @@ def answer_query(
         citations=citations,
         guardrail_status=GuardrailStatus(
             rag_grounded=True,
-            fallback_used=False,
-            critic_score=round(1.0 - confidence, 4),
+            fallback_used=fallback_used,
+            reason=reason,
+            critic_score=guard_res["critic_score"],
         ),
         latency_ms=round(latency_ms, 2),
     )

@@ -1,0 +1,1282 @@
+{
+  "collected_at_utc": "2026-06-05T09:28:53.840241+00:00",
+  "collection_policy": "One highest-section-coverage human prescription label record per configured generic drug query.",
+  "domain": "medical_prescription",
+  "downloaded_count": 30,
+  "drug_count": 30,
+  "records": [
+    {
+      "brand_names": [
+        "Acetaminophen"
+      ],
+      "generic_names": [
+        "ACETAMINOPHEN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/acetaminophen.json",
+      "manufacturer_names": [
+        "NuCare Pharmaceuticals,Inc."
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/acetaminophen.md",
+      "query_drug": "acetaminophen",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "overdosage"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22acetaminophen%22&limit=10",
+      "spl_id": "404529fa-4eba-d862-e063-6394a90a08b9",
+      "spl_set_id": "004c39cd-b4f4-1cae-e063-6394a90a0697",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Albuterol sulfate"
+      ],
+      "generic_names": [
+        "ALBUTEROL SULFATE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/albuterol.json",
+      "manufacturer_names": [
+        "REMEDYREPACK INC."
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/albuterol.md",
+      "query_drug": "albuterol",
+      "reason": null,
+      "route": [
+        "RESPIRATORY (INHALATION)"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22albuterol%22&limit=10",
+      "spl_id": "4f588cfe-721a-363f-e063-6394a90af868",
+      "spl_set_id": "0cfb6c5d-eac2-4a1c-8a0f-6b00e819adda",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Amoxicillin"
+      ],
+      "generic_names": [
+        "AMOXICILLIN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/amoxicillin.json",
+      "manufacturer_names": [
+        "PD-Rx Pharmaceuticals, Inc."
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/amoxicillin.md",
+      "query_drug": "amoxicillin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22amoxicillin%22&limit=10",
+      "spl_id": "2cf156b1-81d6-05eb-e063-6394a90aa475",
+      "spl_set_id": "05b9b595-05d9-469f-82a3-c2bc94c50be2",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "ELIQUIS"
+      ],
+      "generic_names": [
+        "APIXABAN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/apixaban.json",
+      "manufacturer_names": [
+        "Cardinal Health 107, LLC"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/apixaban.md",
+      "query_drug": "apixaban",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22apixaban%22&limit=10",
+      "spl_id": "35ab1342-e927-4bd0-9020-628b859dfb38",
+      "spl_set_id": "a454cd24-0c6d-46e8-b1e4-197388606175",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "HEB Effervescent Pain Relief"
+      ],
+      "generic_names": [
+        "ASPIRIN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/aspirin.json",
+      "manufacturer_names": [
+        "H. E. BUTT GROCERY COMPANY"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/aspirin.md",
+      "query_drug": "aspirin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "pregnancy",
+        "overdosage"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22aspirin%22&limit=10",
+      "spl_id": "285f424d-b50c-c734-e063-6394a90a9680",
+      "spl_set_id": "03876c71-60ec-3280-e063-6294a90a62dc",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "ATORVASTATIN CALCIUM"
+      ],
+      "generic_names": [
+        "ATORVASTATIN CALCIUM"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/atorvastatin.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/atorvastatin.md",
+      "query_drug": "atorvastatin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "patient_medication_information",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22atorvastatin%22&limit=10",
+      "spl_id": "16400a94-a140-4df0-bd7f-52a6e117dec3",
+      "spl_set_id": "06abf2dc-5ebd-4d42-b43c-7deeb93925dd",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "azithromycin"
+      ],
+      "generic_names": [
+        "AZITHROMYCIN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/azithromycin.json",
+      "manufacturer_names": [
+        "Lupin Pharmaceuticals, Inc."
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/azithromycin.md",
+      "query_drug": "azithromycin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22azithromycin%22&limit=10",
+      "spl_id": "94b31917-601f-41bc-a6c8-2873d5d719a6",
+      "spl_set_id": "01649d79-4677-4577-a3e4-e054f3f9fc3b",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Clopidogrel"
+      ],
+      "generic_names": [
+        "CLOPIDOGREL"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/clopidogrel.json",
+      "manufacturer_names": [
+        "Amneal Pharmaceuticals LLC"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/clopidogrel.md",
+      "query_drug": "clopidogrel",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22clopidogrel%22&limit=10",
+      "spl_id": "360ed8dd-4f92-46fc-b31b-abe0d75e9bb3",
+      "spl_set_id": "0d010775-1160-4b2e-a928-563a02edd191",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "DOXYCYCLINE HYCLATE"
+      ],
+      "generic_names": [
+        "DOXYCYCLINE HYCLATE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/doxycycline.json",
+      "manufacturer_names": [
+        "Solco Healthcare US LLC"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/doxycycline.md",
+      "query_drug": "doxycycline",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22doxycycline%22&limit=10",
+      "spl_id": "49c9be01-a1bf-48aa-8ef4-0584e8dcaac5",
+      "spl_set_id": "0a18d4c7-9484-4d3e-b61b-e81fe63fefec",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Escitalopram"
+      ],
+      "generic_names": [
+        "ESCITALOPRAM"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/escitalopram.json",
+      "manufacturer_names": [
+        "Bryant Ranch Prepack"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/escitalopram.md",
+      "query_drug": "escitalopram",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22escitalopram%22&limit=10",
+      "spl_id": "64a7bb93-6461-45c9-b5ca-610a25db5140",
+      "spl_set_id": "102c3893-4fdc-40b3-bd83-775e292723d7",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Fluoxetine"
+      ],
+      "generic_names": [
+        "FLUOXETINE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/fluoxetine.json",
+      "manufacturer_names": [
+        "Aurobindo Pharma Limited"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/fluoxetine.md",
+      "query_drug": "fluoxetine",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22fluoxetine%22&limit=10",
+      "spl_id": "09fb3100-1e06-4cdc-8016-7e4f5d097490",
+      "spl_set_id": "09fb3100-1e06-4cdc-8016-7e4f5d097490",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Furosemide"
+      ],
+      "generic_names": [
+        "FUROSEMIDE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/furosemide.json",
+      "manufacturer_names": [
+        "Phlow Corporation"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/furosemide.md",
+      "query_drug": "furosemide",
+      "reason": null,
+      "route": [
+        "INTRAMUSCULAR",
+        "INTRAVENOUS"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22furosemide%22&limit=10",
+      "spl_id": "e70f323d-2e94-4824-bb92-d43013caa497",
+      "spl_set_id": "08a44bdd-028d-41af-9d4e-70971b0bcc4e",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Gabapentin"
+      ],
+      "generic_names": [
+        "GABAPENTIN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/gabapentin.json",
+      "manufacturer_names": [
+        "Bryant Ranch Prepack"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/gabapentin.md",
+      "query_drug": "gabapentin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22gabapentin%22&limit=10",
+      "spl_id": "6a6e1a33-d95c-4ab1-a9f9-1dada8330ca9",
+      "spl_set_id": "01b810b7-f4c8-4412-bbc5-b9220d8770d8",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "olmesartan medoxomil-hydrochlorothiazide"
+      ],
+      "generic_names": [
+        "OLMESARTAN MEDOXOMIL-HYDROCHLOROTHIAZIDE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/hydrochlorothiazide.json",
+      "manufacturer_names": [
+        "AvKARE"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/hydrochlorothiazide.md",
+      "query_drug": "hydrochlorothiazide",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22hydrochlorothiazide%22&limit=10",
+      "spl_id": "48bfa982-5678-139d-e063-6294a90adbfa",
+      "spl_set_id": "017bc6a3-5b3d-2381-e063-6394a90abece",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Ibuprofen"
+      ],
+      "generic_names": [
+        "IBUPROFEN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/ibuprofen.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/ibuprofen.md",
+      "query_drug": "ibuprofen",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "contraindications",
+        "adverse_reactions",
+        "drug_interactions",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22ibuprofen%22&limit=10",
+      "spl_id": "56fb8ceb-3a90-44df-881b-9d93606bbac6",
+      "spl_set_id": "0170876a-d8cd-4a2d-8397-db2acdf72ffb",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "TOUJEO"
+      ],
+      "generic_names": [
+        "INSULIN GLARGINE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/insulin_glargine.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/insulin_glargine.md",
+      "query_drug": "insulin glargine",
+      "reason": null,
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22insulin+glargine%22&limit=10",
+      "spl_id": "cab55702-5aa0-48a9-9989-36255bffb0e4",
+      "spl_set_id": "257ca17b-6ff7-4f2e-9037-4c185bac5768",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Levothyroxine sodium"
+      ],
+      "generic_names": [
+        "LEVOTHYROXINE SODIUM"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/levothyroxine.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/levothyroxine.md",
+      "query_drug": "levothyroxine",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22levothyroxine%22&limit=10",
+      "spl_id": "f059a576-bb4b-441d-917e-4338bc3df403",
+      "spl_set_id": "008de8fd-150f-4022-8ccb-c8bfa94875c7",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Lisinopril"
+      ],
+      "generic_names": [
+        "LISINOPRIL"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/lisinopril.json",
+      "manufacturer_names": [
+        "Aphena Pharma Solutions - Tennessee, LLC"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/lisinopril.md",
+      "query_drug": "lisinopril",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22lisinopril%22&limit=10",
+      "spl_id": "03a22769-c7ac-496c-80c4-98f76c371987",
+      "spl_set_id": "021831ab-dfeb-40fc-aede-4aa1fbb8d918",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Losartan Potassium"
+      ],
+      "generic_names": [
+        "LOSARTAN POTASSIUM"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/losartan.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/losartan.md",
+      "query_drug": "losartan",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22losartan%22&limit=10",
+      "spl_id": "e956cb01-a44e-4855-9359-ce5787862311",
+      "spl_set_id": "0e0a06f3-b8bd-4178-a519-ed80362e33c2",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Metformin Hydrochloride"
+      ],
+      "generic_names": [
+        "METFORMIN HYDROCHLORIDE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/metformin.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/metformin.md",
+      "query_drug": "metformin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22metformin%22&limit=10",
+      "spl_id": "e7a6bb9d-6691-44d9-932f-5d3298191aa4",
+      "spl_set_id": "056072d8-6228-4914-831d-ee7c0661b742",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Metoprolol Succinate"
+      ],
+      "generic_names": [
+        "METOPROLOL SUCCINATE ER TABLETS"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/metoprolol.json",
+      "manufacturer_names": [
+        "Bryant Ranch Prepack"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/metoprolol.md",
+      "query_drug": "metoprolol",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22metoprolol%22&limit=10",
+      "spl_id": "ddb7fed1-c449-4473-95c1-9aa4c68de5cf",
+      "spl_set_id": "01908d20-0e16-4410-bd27-1b6df162ede4",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Morphine sulfate"
+      ],
+      "generic_names": [
+        "MORPHINE SULFATE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/morphine.json",
+      "manufacturer_names": [
+        "Actavis Pharma, Inc."
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/morphine.md",
+      "query_drug": "morphine",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22morphine%22&limit=10",
+      "spl_id": "d41b3be8-7ef7-4b1d-9692-fffd13baf96d",
+      "spl_set_id": "2da87bfa-11fd-43e3-8fef-d16ebeb15680",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Naproxen"
+      ],
+      "generic_names": [
+        "NAPROXEN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/naproxen.json",
+      "manufacturer_names": [
+        "TruPharma LLC"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/naproxen.md",
+      "query_drug": "naproxen",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "nursing_mothers",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22naproxen%22&limit=10",
+      "spl_id": "28a0f21b-859f-0459-e063-6394a90a08e0",
+      "spl_set_id": "004bb832-29d5-add0-e063-6394a90a90f4",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Omeprazole"
+      ],
+      "generic_names": [
+        "OMEPRAZOLE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/omeprazole.json",
+      "manufacturer_names": [
+        "PD-Rx Pharmaceuticals, Inc."
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/omeprazole.md",
+      "query_drug": "omeprazole",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22omeprazole%22&limit=10",
+      "spl_id": "4bac7b98-8e95-1e51-e063-6294a90ab1cc",
+      "spl_set_id": "0344268f-d8e6-48d5-b1e1-f750ed1d8a52",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Ondansetron"
+      ],
+      "generic_names": [
+        "ONDANSETRON"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/ondansetron.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/ondansetron.md",
+      "query_drug": "ondansetron",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22ondansetron%22&limit=10",
+      "spl_id": "b78afa5d-da9c-4dbb-8509-857dc2b89dd0",
+      "spl_set_id": "02ddd5f5-76d3-4f1c-9af3-d39e05a19c29",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Prednisone delayed release"
+      ],
+      "generic_names": [
+        "PREDNISONE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/prednisone.json",
+      "manufacturer_names": [
+        "Dr. Reddys Laboratories Inc."
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/prednisone.md",
+      "query_drug": "prednisone",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22prednisone%22&limit=10",
+      "spl_id": "a9e0d98c-c1bf-62b0-67b3-3b8f8313b408",
+      "spl_set_id": "01bdc479-1f1f-af94-837c-12e7e861321a",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Rosuvastatin"
+      ],
+      "generic_names": [
+        "ROSUVASTATIN"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/rosuvastatin.json",
+      "manufacturer_names": [
+        "Quallent Pharmaceuticals Health LLC"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/rosuvastatin.md",
+      "query_drug": "rosuvastatin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22rosuvastatin%22&limit=10",
+      "spl_id": "0d12ae85-71bd-4818-a82d-fd068530bd87",
+      "spl_set_id": "0d12ae85-71bd-4818-a82d-fd068530bd87",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "WEGOVY"
+      ],
+      "generic_names": [
+        "SEMAGLUTIDE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/semaglutide.json",
+      "manufacturer_names": [
+        "Novo Nordisk Pharmaceutical Industries, LP"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/semaglutide.md",
+      "query_drug": "semaglutide",
+      "reason": null,
+      "route": [
+        "ORAL",
+        "SUBCUTANEOUS"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22semaglutide%22&limit=10",
+      "spl_id": "2cf550fd-3019-4202-b112-2009de398600",
+      "spl_set_id": "ee06186f-2aa3-4990-a760-757579d8f77b",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Sertraline"
+      ],
+      "generic_names": [
+        "SERTRALINE"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/sertraline.json",
+      "manufacturer_names": [
+        "Bryant Ranch Prepack"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/sertraline.md",
+      "query_drug": "sertraline",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22sertraline%22&limit=10",
+      "spl_id": "d5a00c50-f44a-4234-a60d-35178ee025dc",
+      "spl_set_id": "03e1f274-fa9a-4461-b7c9-31ba6428c107",
+      "status": "downloaded"
+    },
+    {
+      "brand_names": [
+        "Warfarin Sodium"
+      ],
+      "generic_names": [
+        "WARFARIN SODIUM"
+      ],
+      "json_path": "data/raw/medical_prescription/source_json/openfda_labels/warfarin.json",
+      "manufacturer_names": [
+        "A-S Medication Solutions"
+      ],
+      "markdown_path": "data/raw/medical_prescription/openfda_labels/warfarin.md",
+      "query_drug": "warfarin",
+      "reason": null,
+      "route": [
+        "ORAL"
+      ],
+      "sections": [
+        "boxed_warning",
+        "indications_and_usage",
+        "dosage_and_administration",
+        "dosage_forms_and_strengths",
+        "contraindications",
+        "warnings_and_cautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "use_in_specific_populations",
+        "pregnancy",
+        "pediatric_use",
+        "geriatric_use",
+        "overdosage",
+        "description",
+        "clinical_pharmacology",
+        "mechanism_of_action",
+        "pharmacodynamics",
+        "pharmacokinetics",
+        "clinical_studies",
+        "information_for_patients"
+      ],
+      "source_url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name%3A%22warfarin%22&limit=10",
+      "spl_id": "2f23e738-86d1-4c87-8dc4-325073723e92",
+      "spl_set_id": "35bf53df-994b-4c32-8bdb-9227e8e195c6",
+      "status": "downloaded"
+    }
+  ],
+  "source": "openFDA drug label API",
+  "source_endpoint": "https://api.fda.gov/drug/label.json"
+}

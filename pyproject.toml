@@ -16,10 +16,38 @@ retrieval = [
   "PyYAML>=6.0.0",
   "PyMuPDF>=1.24.0",
 ]
+training = [
+  "torch>=2.0.0",
+  "transformers>=4.35.0",
+  "peft>=0.7.0",
+  "bitsandbytes>=0.41.0",
+  "datasets>=2.14.0",
+]
+evaluation = [
+  "torch>=2.0.0",
+  "transformers>=4.35.0",
+]
 dev = [
+  "pytest>=8.0.0",
+]
+all = [
+  "fastapi>=0.110.0",
+  "uvicorn>=0.27.0",
+  "qdrant-client>=1.9.0",
+  "sentence-transformers>=2.7.0",
+  "PyYAML>=6.0.0",
+  "PyMuPDF>=1.24.0",
+  "torch>=2.0.0",
+  "transformers>=4.35.0",
+  "peft>=0.7.0",
+  "bitsandbytes>=0.41.0",
+  "datasets>=2.14.0",
   "pytest>=8.0.0",
 ]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+include = ["domain_slm_guardrails*"]

@@ -6,4 +6,7 @@ vector_store: qdrant
 bm25_enabled: true
 qdrant_url: http://localhost:6333
 dense_vector_size: 384
+critic_hallucination_threshold: 0.5
+critic_checkpoint_path: outputs/critic/critic_model.pt
+
 

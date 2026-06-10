@@ -1,7 +1,7 @@
-# Generic Guardrailed SLM Platform With Medical Billing Adapter
+# Generic Guardrailed SLM Platform With Medical Prescription Adapter
 
 ## Summary
-Build a reusable domain-adaptation and guarded-inference platform for Small Language Models, with **medical billing** as the first production adapter. The core system will support future domains like legal compliance, insurance policy, finance, and internal enterprise SOPs without rewriting the whole stack.
+Build a reusable domain-adaptation and guarded-inference platform for Small Language Models, with **medical prescription** as the first production adapter. The core system will support future domains like legal compliance, insurance policy, finance, and internal enterprise SOPs without rewriting the whole stack.
 
 The v1 goal is a working deployable system that can ingest domain documents, fine-tune or align an SLM, retrieve evidence, generate source-grounded answers, detect hallucination risk, and return structured auditable outputs.
 
@@ -24,10 +24,10 @@ The v1 goal is a working deployable system that can ingest domain documents, fin
   - fallback behavior
   - domain-specific labels and terminology
 
-## Medical Billing Adapter
-- Implement `medical_billing` as the first domain adapter.
-- Ingest medical billing documents such as CPT/ICD/HCPCS references, payer policies, Medicare manuals, compliance docs, and internal billing SOPs.
-- Define medical billing prompt templates for:
+## Medical Prescription Adapter
+- Implement `medical_prescription` as the first domain adapter.
+- Ingest medical prescription documents such as CPT/ICD/HCPCS references, payer policies, Medicare manuals, compliance docs, and internal billing SOPs.
+- Define medical prescription prompt templates for:
   - billing Q&A
   - code/modifier explanation
   - claim review
@@ -39,7 +39,7 @@ The v1 goal is a working deployable system that can ingest domain documents, fin
   - `coding_recommendation`
   - `missing_documentation`
   - `risk_assessment`
-- Build a medical billing benchmark set to measure factual grounding, citation quality, hallucination rate, and safe refusal behavior.
+- Build a medical prescription benchmark set to measure factual grounding, citation quality, hallucination rate, and safe refusal behavior.
 
 ## Inputs And Outputs
 - Supported input types:
@@ -51,7 +51,7 @@ The v1 goal is a working deployable system that can ingest domain documents, fin
 - Runtime query example:
 ```json
 {
-  "domain": "medical_billing",
+  "domain": "medical_prescription",
   "task": "claim_review",
   "query": "Can CPT 99214 be billed with modifier 25?",
   "output_format": "claim_review"
@@ -114,7 +114,7 @@ The v1 goal is a working deployable system that can ingest domain documents, fin
 
 ## Test Plan
 - Unit tests for ingestion, chunking, retrieval, prompt assembly, schema validation, and fallback logic.
-- Integration tests for full medical billing flow: document ingest → retrieval → answer → citations → guardrail status.
+- Integration tests for full medical prescription flow: document ingest → retrieval → answer → citations → guardrail status.
 - Training smoke tests for QLoRA, DPO, hidden-state capture, and critic training on small datasets.
 - Evaluation benchmarks:
   - citation coverage
@@ -131,15 +131,15 @@ The v1 goal is a working deployable system that can ingest domain documents, fin
 
 ## Timeline
 - **Week 1:** scaffold generic platform, domain registry, ingestion, chunking, Qdrant, BM25 retrieval.
-- **Week 2:** medical billing adapter, RAG API baseline, citation-bearing responses, initial evaluation set.
-- **Week 3:** QLoRA training pipeline, medical billing SFT dataset, adapter export.
+- **Week 2:** medical prescription adapter, RAG API baseline, citation-bearing responses, initial evaluation set.
+- **Week 3:** QLoRA training pipeline, medical prescription SFT dataset, adapter export.
 - **Week 4:** DPO preference generation, DPO training, groundedness comparison against SFT baseline.
 - **Week 5:** hidden-state collection, token labeling, critic dataset generation.
 - **Week 6:** critic model training, AUC evaluation, threshold tuning.
 - **Week 7:** live guardrail hook, constrained decoding, fallback path, Docker deployment, final benchmarks.
 
 ## Assumptions
-- The platform is generic, but v1 proof domain is medical billing.
+- The platform is generic, but v1 proof domain is medical prescription.
 - Qdrant is the default vector store.
 - Outlines is the default constrained decoding library.
 - FastAPI is the serving layer.

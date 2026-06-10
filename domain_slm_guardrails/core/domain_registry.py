@@ -40,6 +40,30 @@ class DomainConfig:
     def dense_index_path(self) -> Path:
         return self.index_path / "dense_vectors.jsonl"
 
+    @property
+    def page_header_pattern(self) -> str | None:
+        return self.settings.get("page_header_pattern")
+
+    @property
+    def page_header_prefix_pattern(self) -> str | None:
+        return self.settings.get("page_header_prefix_pattern")
+
+    @property
+    def domain_generic_terms(self) -> set[str]:
+        terms = self.settings.get("domain_generic_terms", [])
+        return {str(t).lower() for t in terms}
+
+    @property
+    def critic_hallucination_threshold(self) -> float:
+        return float(self.settings.get("critic_hallucination_threshold", 0.5))
+
+    @property
+    def critic_checkpoint_path(self) -> Path | None:
+        path_str = self.settings.get("critic_checkpoint_path")
+        if not path_str:
+            return None
+        return _resolve_path(self.root, path_str)
+
 
 def _resolve_path(root: Path, raw_path: str | Path) -> Path:
     path = Path(raw_path)

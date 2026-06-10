@@ -10,11 +10,11 @@ from domain_slm_guardrails.evaluation.rag_eval import (
 def test_rag_eval_scores_cases():
     cases = [
         RAGEvalCase(
-            id="modifier_25",
-            domain="medical_billing",
-            query="When should modifier 25 be used?",
-            expected_terms=["modifier 25"],
-            expected_source_ids=["sample_modifier_25"],
+            id="albuterol_dosage",
+            domain="medical_prescription",
+            query="What is the recommended dosage of albuterol sulfate for acute bronchospasm?",
+            expected_terms=["two inhalations", "4 to 6 hours"],
+            expected_source_ids=["albuterol"],
         )
     ]
 

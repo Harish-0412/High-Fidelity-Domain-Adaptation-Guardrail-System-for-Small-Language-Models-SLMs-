@@ -15,7 +15,7 @@ from domain_slm_guardrails.retrieval.vector_store import try_build_qdrant_store,
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build BM25 and dense indexes for a domain.")
-    parser.add_argument("--domain", required=True, help="Domain id, for example medical_billing")
+    parser.add_argument("--domain", required=True, help="Domain id, for example medical_prescription")
     parser.add_argument(
         "--no-qdrant",
         action="store_true",

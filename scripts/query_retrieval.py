@@ -15,7 +15,7 @@ from domain_slm_guardrails.retrieval.vector_store import LocalDenseIndex
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Query a domain's hybrid retrieval index.")
-    parser.add_argument("--domain", required=True, help="Domain id, for example medical_billing")
+    parser.add_argument("--domain", required=True, help="Domain id, for example medical_prescription")
     parser.add_argument("--query", required=True, help="User query to retrieve evidence for")
     parser.add_argument("--top-k", type=int, default=5, help="Number of chunks to return")
     args = parser.parse_args()

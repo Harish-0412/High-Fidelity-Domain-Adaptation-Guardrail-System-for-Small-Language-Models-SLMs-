@@ -5,8 +5,8 @@ from domain_slm_guardrails.api.rag import answer_query
 
 def test_answer_query_returns_citations():
     response = answer_query(
-        domain="medical_billing",
-        query="When should modifier 25 be used?",
+        domain="medical_prescription",
+        query="What is the recommended dosage of albuterol sulfate for acute bronchospasm?",
         top_k=3,
     )
 
@@ -18,8 +18,8 @@ def test_answer_query_returns_citations():
 
 def test_answer_query_falls_back_for_no_evidence():
     response = answer_query(
-        domain="medical_billing",
-        query="zzzznotamedicalbillingterm qqqqunknown",
+        domain="medical_prescription",
+        query="zzzznotamedicalprescriptionterm qqqqunknown",
         top_k=3,
     )
 

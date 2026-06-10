@@ -11,10 +11,10 @@ def test_chunks_are_stable_and_preserve_metadata():
         page=12,
         text=" ".join(f"token{i}" for i in range(30)),
     )
-    chunks = chunk_page(page, domain="medical_billing", chunk_size_tokens=10, chunk_overlap_tokens=2)
+    chunks = chunk_page(page, domain="medical_prescription", chunk_size_tokens=10, chunk_overlap_tokens=2)
 
     assert len(chunks) == 4
-    assert chunks[0].chunk_id == "medical_billing_doc1_p0012_c001"
+    assert chunks[0].chunk_id == "medical_prescription_doc1_p0012_c001"
     assert chunks[0].source_id == "doc1"
     assert chunks[0].page == 12
     assert chunks[0].token_count == 10

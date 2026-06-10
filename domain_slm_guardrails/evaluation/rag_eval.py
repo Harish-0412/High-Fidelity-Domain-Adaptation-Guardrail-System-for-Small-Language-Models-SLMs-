@@ -84,5 +84,69 @@ def summarize_results(results: list[RAGEvalResult]) -> dict[str, object]:
 
 
 def default_eval_path() -> Path:
-    return project_root() / "data" / "evaluation" / "medical_billing" / "rag_eval.jsonl"
+    return project_root() / "data" / "evaluation" / "medical_prescription" / "rag_eval.jsonl"
+
+
+def evaluate_critic_on_rag(
+    cases: list[RAGEvalCase],
+    model: Any,
+    tokenizer: Any,
+    critic: Any,
+    layer_index: int,
+    device: str = "cpu",
+) -> dict[str, float]:
+    """Evaluate a trained critic model on RAG queries, returning AUC, Precision, Recall, and F1."""
+    from domain_slm_guardrails.critic.collector import HiddenStateCollector
+    from domain_slm_guardrails.critic.trainer import calculate_metrics
+    import torch
+
+    collector = HiddenStateCollector(model=model, tokenizer=tokenizer, device=device)
+    
+    y_true = []
+    y_scores = []
+    
+    for case in cases:
+        from domain_slm_guardrails.retrieval.hybrid import load_hybrid_retriever
+        try:
+            retriever = load_hybrid_retriever(case.domain)
+            retrieved = retriever.search(case.query, top_k=1)
+            if not retrieved:
+                continue
+            source_chunk = retrieved[0].chunk["text"]
+            source_id = retrieved[0].chunk["source_id"]
+        except Exception:
+            source_chunk = "Mock reference context"
+            source_id = "mock"
+
+        try:
+            records = collector.collect_from_query(
+                query=case.query,
+                source_chunk=source_chunk,
+                source_id=source_id,
+                layer_indices=[layer_index],
+            )
+        except Exception:
+            continue
+
+        if not records:
+            continue
+
+        states = [r["hidden_state"] for r in records]
+        labels = [r["grounded_label"] for r in records]
+
+        # Ground truth: 1 if all tokens are grounded, else 0
+        seq_true_grounded = 0 if (0 in labels) else 1
+        # Target metric is hallucination detection: 1 if hallucinated, 0 if grounded
+        y_true.append(1 - seq_true_grounded)
+
+        # Run critic model prediction
+        seq_tensor = torch.tensor(states, dtype=torch.float).unsqueeze(0).to(device)
+        res = critic.predict_hallucination(seq_tensor)
+        y_scores.append(res["hallucination_probability"])
+
+    if not y_true:
+        return {"auc": 0.5, "precision": 0.0, "recall": 0.0, "f1": 0.0}
+
+    return calculate_metrics(y_true, y_scores)
+
 
