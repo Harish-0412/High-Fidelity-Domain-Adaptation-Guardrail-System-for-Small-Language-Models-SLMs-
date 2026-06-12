@@ -175,6 +175,18 @@ class QdrantVectorStore:
             ),
         )
 
+        from qdrant_client.http.models import PayloadSchemaType
+        self.client.create_payload_index(
+            collection_name=self.collection_name,
+            field_name="domain",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+        self.client.create_payload_index(
+            collection_name=self.collection_name,
+            field_name="source_id",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+
     # Keep the old name for backward-compat
     def recreate_collection(self) -> None:
         self.ensure_collection(recreate=True)
@@ -182,8 +194,13 @@ class QdrantVectorStore:
     def upsert(self, chunks: list[dict[str, object]], vectors: list[list[float]]) -> None:
         from qdrant_client.http.models import PointStruct  # type: ignore
 
+        import uuid
         points = [
-            PointStruct(id=idx, vector=vector, payload=dict(chunk))
+            PointStruct(
+                id=str(uuid.uuid5(uuid.NAMESPACE_URL, str(chunk.get("chunk_id", idx)))),
+                vector=vector,
+                payload=dict(chunk)
+            )
             for idx, (chunk, vector) in enumerate(zip(chunks, vectors))
         ]
         # Batch upserts to stay within Qdrant's default payload size limit
@@ -197,12 +214,13 @@ class QdrantVectorStore:
         top_k: int = 5,
         query_filter: "Any | None" = None,
     ) -> list[DenseResult]:
-        hits = self.client.search(
+        response = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vector,
+            query=query_vector,
             limit=top_k,
             query_filter=query_filter,
         )
+        hits = response.points
         return [
             DenseResult(chunk=dict(hit.payload or {}), score=float(hit.score))
             for hit in hits

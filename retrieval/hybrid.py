@@ -3,12 +3,17 @@ from __future__ import annotations
 import threading
 from dataclasses import dataclass, field
 from functools import lru_cache
-from typing import Callable
+from typing import Callable, Protocol
 
 from services.core.domain_registry import get_domain_config
 from retrieval.bm25 import BM25Index
 from retrieval.embeddings import load_embedding_model
-from retrieval.vector_store import DenseResult, LocalDenseIndex
+from retrieval.vector_store import DenseResult, LocalDenseIndex, try_build_qdrant_store
+from retrieval.mmr import compute_mmr
+from retrieval.rerank import CrossEncoderReranker, RerankResult
+
+class DenseIndexProtocol(Protocol):
+    def search(self, query_vector: list[float], top_k: int = 5, query_filter: "Any | None" = None) -> list[DenseResult]: ...
 
 
 # ---------------------------------------------------------------------------
@@ -191,7 +196,7 @@ class HybridRetriever:
 
     def __init__(
         self,
-        dense_index: LocalDenseIndex,
+        dense_index: DenseIndexProtocol,
         bm25_index: BM25Index,
         embedding_model_name: str = "local-hashing",
         embedding_dimension: int = 384,
@@ -199,6 +204,10 @@ class HybridRetriever:
         use_rrf: bool = True,
         rrf_k: int = 60,
         dense_weight: float = 0.6,
+        use_mmr: bool = False,
+        mmr_lambda: float = 0.5,
+        use_rerank: bool = False,
+        rerank_model: str = "ms-marco-TinyBERT-L-2-v2",
     ):
         self.dense_index = dense_index
         self.bm25_index = bm25_index
@@ -210,6 +219,13 @@ class HybridRetriever:
         self.use_rrf = use_rrf
         self.rrf_k = rrf_k
         self.dense_weight = dense_weight
+        self.use_mmr = use_mmr
+        self.mmr_lambda = mmr_lambda
+        self.use_rerank = use_rerank
+        
+        self.reranker = None
+        if self.use_rerank:
+            self.reranker = CrossEncoderReranker(model_name=rerank_model)
 
     def search(
         self,
@@ -236,14 +252,55 @@ class HybridRetriever:
         bm25_query = expanded_query if expanded_query else query
         bm25_results = self.bm25_index.search(bm25_query, top_k=candidate_k)
 
-        return merge_results(
+        # Merge results with Hybrid (RRF or weighted)
+        merged_results = merge_results(
             dense_results,
             bm25_results,
-            top_k=top_k,
+            top_k=candidate_k if (self.use_mmr or self.use_rerank) else top_k,
             dense_weight=self.dense_weight,
             use_rrf=self.use_rrf,
             rrf_k=self.rrf_k,
         )
+        
+        candidates_chunks = [res.chunk for res in merged_results]
+        
+        # Apply MMR if configured
+        if self.use_mmr and len(candidates_chunks) > 0:
+            candidate_vectors = self.embedding_model.encode(
+                [str(c.get("text", "")) for c in candidates_chunks]
+            )
+            mmr_indices = compute_mmr(
+                query_vector=query_vector,
+                candidate_vectors=candidate_vectors,
+                candidate_indices=list(range(len(candidates_chunks))),
+                top_k=top_k if not self.use_rerank else candidate_k,
+                lambda_mult=self.mmr_lambda,
+            )
+            candidates_chunks = [candidates_chunks[i] for i in mmr_indices]
+            
+        # Apply Reranker if configured
+        if self.use_rerank and self.reranker:
+            reranked = self.reranker.rerank(
+                query=query,
+                candidates=candidates_chunks,
+                top_k=top_k
+            )
+            return reranked
+            
+        # If no reranking, return the HybridResults (trimmed to top_k)
+        if self.use_mmr:
+            # We must recreate HybridResult from mmr to preserve typing if needed, 
+            # or just return what we have. Returning HybridResults filtered.
+            final_hybrid = []
+            for c in candidates_chunks[:top_k]:
+                # find original
+                for r in merged_results:
+                    if r.chunk.get("chunk_id") == c.get("chunk_id"):
+                        final_hybrid.append(r)
+                        break
+            return final_hybrid
+            
+        return merged_results[:top_k]
 
 
 # ---------------------------------------------------------------------------
@@ -267,16 +324,31 @@ def load_hybrid_retriever(domain_id: str) -> HybridRetriever:
         # (lru_cache itself is not re-entrant-safe during construction)
         domain = get_domain_config(domain_id)
         bm25 = BM25Index.load(domain.bm25_path)
-        dense = LocalDenseIndex.load(domain.dense_index_path)
-
+        
         settings = domain.settings
+        
+        # Build Qdrant store if possible, fallback to local dense index
+        # We need the vector size for both Qdrant initialization and embedding model
+        vector_size = int(settings.get("dense_vector_size", 384))
+        
+        # Using the standard local Qdrant URL for now. This could be extracted to config.
+        qdrant = try_build_qdrant_store("http://localhost:6333", domain.index_name, vector_size)
+        if qdrant:
+            dense: DenseIndexProtocol = qdrant
+        else:
+            dense = LocalDenseIndex.load(domain.dense_index_path)
+
         return HybridRetriever(
             dense_index=dense,
             bm25_index=bm25,
-            embedding_model_name=str(settings["embedding_model"]),
-            embedding_dimension=int(settings["dense_vector_size"]),
+            embedding_model_name=str(settings.get("embedding_model", "local-hashing")),
+            embedding_dimension=vector_size,
             candidate_multiplier=int(settings.get("candidate_multiplier", 5)),
             use_rrf=bool(settings.get("use_rrf", True)),
             rrf_k=int(settings.get("rrf_k", 60)),
             dense_weight=float(settings.get("dense_weight", 0.6)),
+            use_mmr=bool(settings.get("use_mmr", False)),
+            mmr_lambda=float(settings.get("mmr_lambda", 0.5)),
+            use_rerank=bool(settings.get("use_rerank", False)),
+            rerank_model=str(settings.get("rerank_model", "ms-marco-TinyBERT-L-2-v2")),
         )

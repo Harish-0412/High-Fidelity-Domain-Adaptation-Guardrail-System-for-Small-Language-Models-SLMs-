@@ -10,6 +10,16 @@ api = [
   "fastapi>=0.110.0",
   "uvicorn>=0.27.0",
 ]
+runtime = [
+  "fastapi>=0.110.0",
+  "uvicorn>=0.27.0",
+  "qdrant-client>=1.9.0",
+  "redis>=5.0.0",
+  "PyYAML>=6.0.0",
+  "PyMuPDF>=1.24.0",
+  "flashrank>=0.2.0",
+  "httpx>=0.24.0",
+]
 retrieval = [
   "qdrant-client>=1.9.0",
   "sentence-transformers>=2.7.0",
@@ -50,4 +60,4 @@ pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
-include = ["domain_slm_guardrails*"]
+include = ["api*", "ingestion*", "retrieval*", "services*"]

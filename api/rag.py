@@ -27,47 +27,12 @@ except Exception:
     enforcer = LiveGuardrailEnforcer()
     base_cfg = {}
 
-try:
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorList
-    from services.critic.collector import HiddenStateCollector
-except ImportError:
-    torch = None
+import httpx
+import json
 
-try:
-    from outlines import from_transformers
-    from outlines.generator import get_json_schema_logits_processor
-except ImportError:
-    from_transformers = None
-    get_json_schema_logits_processor = None
-
-_hf_model = None
-_hf_tokenizer = None
-_collector = None
-
-def get_collector():
-    global _hf_model, _hf_tokenizer, _collector
-    if torch is None:
-        return None
-    if _collector is None:
-        try:
-            model_name = base_cfg.get("base_model_path", "Qwen/Qwen2.5-3B")
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            _hf_tokenizer = AutoTokenizer.from_pretrained(model_name)
-            _hf_model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                device_map="auto" if torch.cuda.is_available() else None,
-                low_cpu_mem_usage=True
-            )
-            _hf_model.eval()
-            if not torch.cuda.is_available():
-                _hf_model.to(device)
-            _collector = HiddenStateCollector(model=_hf_model, tokenizer=_hf_tokenizer, device=device)
-        except Exception as e:
-            print(f"Warning: Failed to load HF model: {e}")
-            _collector = None
-    return _collector
+# Define the Ollama configuration (we can hardcode for this iteration or put in base_cfg)
+OLLAMA_URL = base_cfg.get("ollama_url", "http://localhost:11434")
+OLLAMA_MODEL = base_cfg.get("ollama_model", "qwen2.5:3b")
 
 
 
@@ -399,13 +364,13 @@ def _make_citations(results: list[HybridResult], max_chars: int) -> list[Citatio
 # Query support filter
 # ---------------------------------------------------------------------------
 
-def _has_query_support(query: str, result: HybridResult) -> bool:
+def _has_query_support(query: str, result) -> bool:
     """
     Accept a result if it has at least one of:
     * non-zero BM25 score (lexical match)
     * direct term overlap with the query
     """
-    if result.bm25_score > 0:
+    if hasattr(result, "bm25_score") and result.bm25_score > 0:
         return True
     terms = _query_terms(query)
     text_terms = _query_terms(str(result.chunk.get("text", "")))
@@ -416,7 +381,7 @@ def _has_query_support(query: str, result: HybridResult) -> bool:
 # Confidence estimation
 # ---------------------------------------------------------------------------
 
-def _estimate_confidence(results: list[HybridResult], sentences: list[str]) -> float:
+def _estimate_confidence(results, sentences: list[str]) -> float:
     """
     Lightweight confidence signal (0–1) derived from:
     * Top hybrid score
@@ -427,7 +392,7 @@ def _estimate_confidence(results: list[HybridResult], sentences: list[str]) -> f
         return 0.0
     top_score = results[0].score
     sentence_ratio = min(len(sentences) / 3, 1.0)  # normalise against 3 target sentences
-    dual_support = 1.0 if (results[0].dense_score > 0 and results[0].bm25_score > 0) else 0.5
+    dual_support = 1.0 if (hasattr(results[0], "dense_score") and getattr(results[0], "dense_score", 0) > 0 and getattr(results[0], "bm25_score", 0) > 0) else 0.5
     return min(top_score * 0.6 + sentence_ratio * 0.25 + dual_support * 0.15, 1.0)
 
 
@@ -486,55 +451,104 @@ def answer_query(
     # Evidence path
     # -----------------------------------------------------------------------
     citations = _make_citations(results, config.max_citation_chars)
-    retrieved_context = "\n".join(str(r.chunk.get("text", "")) for r in results)
     
-    collector = get_collector()
-    if collector:
-        layer_index = enforcer.critic_metadata.get("layer_index")
-        layer_indices = [layer_index] if layer_index is not None else None
-        
-        # Build Outlines Logits Processor
-        lp_list = None
-        if from_transformers and get_json_schema_logits_processor:
-            from api.schemas import AnswerWithCitations, DrugInteractionReport, PrescriptionSummary
-            import json
-            
-            schema_map = {
-                "answer_with_citations": AnswerWithCitations,
-                "drug_interaction_report": DrugInteractionReport,
-                "prescription_summary": PrescriptionSummary
-            }
-            schema_class = schema_map.get(output_format, AnswerWithCitations)
-            
-            outlines_model = from_transformers(_hf_model, _hf_tokenizer)
-            lp = get_json_schema_logits_processor(None, outlines_model, json.dumps(schema_class.model_json_schema()))
-            lp_list = LogitsProcessorList([lp])
-
-        records = collector.collect_from_query(
+    # -----------------------------------------------------------------------
+    # Guardrail: Out-Of-Distribution (OOD) Protection
+    # -----------------------------------------------------------------------
+    # We rely on the reranker score. If the best score is < 0.85, we short-circuit.
+    # If reranker isn't used, we rely on the dense/hybrid score.
+    best_score = results[0].score
+    is_reranked = hasattr(results[0], "original_rank")  # A proxy check for RerankResult
+    ood_threshold = 0.85 if is_reranked else 0.5
+    
+    if best_score < ood_threshold:
+        latency_ms = (time.perf_counter() - started) * 1000
+        return QueryResponse(
+            domain=domain,
             query=query,
-            source_chunk=retrieved_context,
-            source_id="hybrid_retrieval",
-            layer_indices=layer_indices,
-            max_new_tokens=128,
-            logits_processor=lp_list
+            answer="I could not verify this confidently from the available source documents.",
+            citations=[],
+            guardrail_status=GuardrailStatus(
+                rag_grounded=True,
+                fallback_used=True,
+                reason="ood_threshold_failed",
+                critic_score=round(best_score, 4),
+            ),
+            latency_ms=round(latency_ms, 2),
         )
+
+    # -----------------------------------------------------------------------
+    # Ollama Generation Path
+    # -----------------------------------------------------------------------
+    context_xml = "<Context>\n"
+    for idx, r in enumerate(results, 1):
+        context_xml += f'<Document id="C{idx}">\n{str(r.chunk.get("text", ""))}\n</Document>\n'
+    context_xml += "</Context>"
+    
+    system_prompt = (
+        "You are a helpful, precise medical AI assistant. Your task is to answer the user's question "
+        "USING ONLY the provided XML Context documents.\n"
+        "RULES:\n"
+        "1. Answer ONLY based on the provided Context.\n"
+        "2. If the Context does not contain the answer, say 'I could not verify this confidently from the available source documents.'\n"
+        "3. Every claim you make MUST be immediately followed by the document ID it was drawn from, "
+        "formatted exactly as [C1], [C2], etc.\n"
+        "4. Do NOT use outside knowledge.\n"
+        "5. Keep the answer concise and direct."
+    )
+    
+    user_prompt = f"{context_xml}\n\nQuestion: {query}"
+    
+    answer_body = None
+    ollama_failed = False
+    
+    # Get the JSON schema for the requested output format
+    from api.schemas import AnswerWithCitations, DrugInteractionReport, PrescriptionSummary
+    schema_map = {
+        "answer_with_citations": AnswerWithCitations,
+        "drug_interaction_report": DrugInteractionReport,
+        "prescription_summary": PrescriptionSummary
+    }
+    schema_class = schema_map.get(output_format, AnswerWithCitations)
+    json_schema = schema_class.model_json_schema()
+    
+    try:
+        response = httpx.post(
+            f"{OLLAMA_URL}/api/chat",
+            json={
+                "model": OLLAMA_MODEL,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "format": json_schema,
+                "stream": False,
+                "options": {
+                    "temperature": 0.0,
+                    "top_p": 0.9,
+                }
+            },
+            timeout=30.0
+        )
+        response.raise_for_status()
+        answer_body = response.json().get("message", {}).get("content", "").strip()
         
-        if records:
-            hidden_states = [r["hidden_state"] for r in records if "hidden_state" in r]
-            if hidden_states:
-                seq_tensor = torch.tensor(hidden_states, dtype=torch.float32).unsqueeze(0)
-            else:
-                seq_tensor = None
-                
-            answer_body = "".join(r["token"] for r in records).strip()
-            if not answer_body:
-                answer_body = "I could not verify this confidently from the available source documents."
-                seq_tensor = None
-        else:
-            seq_tensor = None
-            answer_body = "I could not verify this confidently from the available source documents."
-    else:
-        # Fallback to extractive approach if HF model is not available
+        # If Ollama decided it cannot answer based on context
+        if "I could not verify" in answer_body or not answer_body:
+            ollama_failed = True
+            reason = "ollama_refusal"
+            
+    except Exception as e:
+        print(f"Warning: Ollama generation failed: {e}")
+        ollama_failed = True
+        reason = "ollama_timeout_extractive_fallback"
+        
+    seq_tensor = None
+    
+    # -----------------------------------------------------------------------
+    # Extractive Fallback Path
+    # -----------------------------------------------------------------------
+    if ollama_failed:
         sentences = _best_sentences(
             query,
             results,
@@ -559,20 +573,24 @@ def answer_query(
                 guardrail_status=GuardrailStatus(
                     rag_grounded=True,
                     fallback_used=True,
-                    reason="low_confidence",
+                    reason=reason if reason != "ollama_refusal" else "low_confidence",
                     critic_score=round(1.0 - confidence, 4),
                 ),
                 latency_ms=round(latency_ms, 2),
             )
 
         answer_body = " ".join(sentences)
-        seq_tensor = None
+        
+        # Assemble answer with citations for extractive fallback
+        top_citation_refs = " ".join(
+            f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
+        )
+        original_answer = f"{answer_body} {top_citation_refs}".strip()
+    else:
+        # Ollama handled the citations naturally via prompt
+        original_answer = answer_body
 
-    # Assemble answer with citations
-    top_citation_refs = " ".join(
-        f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
-    )
-    original_answer = f"{answer_body} {top_citation_refs}".strip()
+    retrieved_context = "\n".join(str(r.chunk.get("text", "")) for r in results)
 
     # Score and enforce
     guard_res = enforcer.score_and_enforce(

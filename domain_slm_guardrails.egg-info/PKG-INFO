@@ -1,0 +1,44 @@
+Metadata-Version: 2.4
+Name: domain-slm-guardrails
+Version: 0.1.0
+Summary: Generic domain retrieval core for guardrailed small language model systems.
+Requires-Python: >=3.10
+Provides-Extra: api
+Requires-Dist: fastapi>=0.110.0; extra == "api"
+Requires-Dist: uvicorn>=0.27.0; extra == "api"
+Provides-Extra: runtime
+Requires-Dist: fastapi>=0.110.0; extra == "runtime"
+Requires-Dist: uvicorn>=0.27.0; extra == "runtime"
+Requires-Dist: qdrant-client>=1.9.0; extra == "runtime"
+Requires-Dist: redis>=5.0.0; extra == "runtime"
+Requires-Dist: PyYAML>=6.0.0; extra == "runtime"
+Requires-Dist: PyMuPDF>=1.24.0; extra == "runtime"
+Provides-Extra: retrieval
+Requires-Dist: qdrant-client>=1.9.0; extra == "retrieval"
+Requires-Dist: sentence-transformers>=2.7.0; extra == "retrieval"
+Requires-Dist: PyYAML>=6.0.0; extra == "retrieval"
+Requires-Dist: PyMuPDF>=1.24.0; extra == "retrieval"
+Provides-Extra: training
+Requires-Dist: torch>=2.0.0; extra == "training"
+Requires-Dist: transformers>=4.35.0; extra == "training"
+Requires-Dist: peft>=0.7.0; extra == "training"
+Requires-Dist: bitsandbytes>=0.41.0; extra == "training"
+Requires-Dist: datasets>=2.14.0; extra == "training"
+Provides-Extra: evaluation
+Requires-Dist: torch>=2.0.0; extra == "evaluation"
+Requires-Dist: transformers>=4.35.0; extra == "evaluation"
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Provides-Extra: all
+Requires-Dist: fastapi>=0.110.0; extra == "all"
+Requires-Dist: uvicorn>=0.27.0; extra == "all"
+Requires-Dist: qdrant-client>=1.9.0; extra == "all"
+Requires-Dist: sentence-transformers>=2.7.0; extra == "all"
+Requires-Dist: PyYAML>=6.0.0; extra == "all"
+Requires-Dist: PyMuPDF>=1.24.0; extra == "all"
+Requires-Dist: torch>=2.0.0; extra == "all"
+Requires-Dist: transformers>=4.35.0; extra == "all"
+Requires-Dist: peft>=0.7.0; extra == "all"
+Requires-Dist: bitsandbytes>=0.41.0; extra == "all"
+Requires-Dist: datasets>=2.14.0; extra == "all"
+Requires-Dist: pytest>=8.0.0; extra == "all"
