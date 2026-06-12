@@ -25,6 +25,50 @@ try:
         enforcer = LiveGuardrailEnforcer()
 except Exception:
     enforcer = LiveGuardrailEnforcer()
+    base_cfg = {}
+
+try:
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorList
+    from domain_slm_guardrails.critic.collector import HiddenStateCollector
+except ImportError:
+    torch = None
+
+try:
+    from outlines import from_transformers
+    from outlines.generator import get_json_schema_logits_processor
+except ImportError:
+    from_transformers = None
+    get_json_schema_logits_processor = None
+
+_hf_model = None
+_hf_tokenizer = None
+_collector = None
+
+def get_collector():
+    global _hf_model, _hf_tokenizer, _collector
+    if torch is None:
+        return None
+    if _collector is None:
+        try:
+            model_name = base_cfg.get("base_model_path", "Qwen/Qwen2.5-3B")
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            _hf_tokenizer = AutoTokenizer.from_pretrained(model_name)
+            _hf_model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                device_map="auto" if torch.cuda.is_available() else None,
+                low_cpu_mem_usage=True
+            )
+            _hf_model.eval()
+            if not torch.cuda.is_available():
+                _hf_model.to(device)
+            _collector = HiddenStateCollector(model=_hf_model, tokenizer=_hf_tokenizer, device=device)
+        except Exception as e:
+            print(f"Warning: Failed to load HF model: {e}")
+            _collector = None
+    return _collector
+
 
 
 # ---------------------------------------------------------------------------
@@ -397,6 +441,7 @@ def answer_query(
     top_k: int = 5,
     config: RAGConfig | None = None,
     expanded_query: str | None = None,
+    output_format: str = "answer_with_citations",
 ) -> QueryResponse:
     """
     Retrieve evidence and assemble a grounded answer.
@@ -441,46 +486,93 @@ def answer_query(
     # Evidence path
     # -----------------------------------------------------------------------
     citations = _make_citations(results, config.max_citation_chars)
-    sentences = _best_sentences(
-        query,
-        results,
-        config.max_answer_sentences,
-        domain_generic_terms=domain_cfg.domain_generic_terms,
-        page_header_pattern=domain_cfg.page_header_pattern,
-        page_header_prefix_pattern=domain_cfg.page_header_prefix_pattern,
-        use_mmr=config.use_mmr,
-        coherence_sort=config.coherence_sort,
-    )
+    retrieved_context = "\n".join(str(r.chunk.get("text", "")) for r in results)
+    
+    collector = get_collector()
+    if collector:
+        layer_index = enforcer.critic_metadata.get("layer_index")
+        layer_indices = [layer_index] if layer_index is not None else None
+        
+        # Build Outlines Logits Processor
+        lp_list = None
+        if from_transformers and get_json_schema_logits_processor:
+            from domain_slm_guardrails.api.schemas import AnswerWithCitations, DrugInteractionReport, PrescriptionSummary
+            import json
+            
+            schema_map = {
+                "answer_with_citations": AnswerWithCitations,
+                "drug_interaction_report": DrugInteractionReport,
+                "prescription_summary": PrescriptionSummary
+            }
+            schema_class = schema_map.get(output_format, AnswerWithCitations)
+            
+            outlines_model = from_transformers(_hf_model, _hf_tokenizer)
+            lp = get_json_schema_logits_processor(None, outlines_model, json.dumps(schema_class.model_json_schema()))
+            lp_list = LogitsProcessorList([lp])
 
-    confidence = _estimate_confidence(results, sentences)
-
-    # Low-confidence fallback: retrieved chunks exist but sentences are too
-    # weakly related to the query to form a reliable answer
-    if confidence < config.low_confidence_score or not sentences:
-        latency_ms = (time.perf_counter() - started) * 1000
-        return QueryResponse(
-            domain=domain,
+        records = collector.collect_from_query(
             query=query,
-            answer="I could not verify this confidently from the available source documents.",
-            citations=citations,      # still include so callers can inspect sources
-            guardrail_status=GuardrailStatus(
-                rag_grounded=True,
-                fallback_used=True,
-                reason="low_confidence",
-                critic_score=round(1.0 - confidence, 4),
-            ),
-            latency_ms=round(latency_ms, 2),
+            source_chunk=retrieved_context,
+            source_id="hybrid_retrieval",
+            layer_indices=layer_indices,
+            max_new_tokens=128,
+            logits_processor=lp_list
+        )
+        
+        if records:
+            hidden_states = [r["hidden_state"] for r in records if "hidden_state" in r]
+            if hidden_states:
+                seq_tensor = torch.tensor(hidden_states, dtype=torch.float32).unsqueeze(0)
+            else:
+                seq_tensor = None
+                
+            answer_body = "".join(r["token"] for r in records).strip()
+            if not answer_body:
+                answer_body = "I could not verify this confidently from the available source documents."
+                seq_tensor = None
+        else:
+            seq_tensor = None
+            answer_body = "I could not verify this confidently from the available source documents."
+    else:
+        # Fallback to extractive approach if HF model is not available
+        sentences = _best_sentences(
+            query,
+            results,
+            config.max_answer_sentences,
+            domain_generic_terms=domain_cfg.domain_generic_terms,
+            page_header_pattern=domain_cfg.page_header_pattern,
+            page_header_prefix_pattern=domain_cfg.page_header_prefix_pattern,
+            use_mmr=config.use_mmr,
+            coherence_sort=config.coherence_sort,
         )
 
-    # Assemble answer: coherently ordered sentences + up to 3 inline citation refs
-    answer_body = " ".join(sentences)
+        confidence = _estimate_confidence(results, sentences)
+
+        # Low-confidence fallback
+        if confidence < config.low_confidence_score or not sentences:
+            latency_ms = (time.perf_counter() - started) * 1000
+            return QueryResponse(
+                domain=domain,
+                query=query,
+                answer="I could not verify this confidently from the available source documents.",
+                citations=citations,
+                guardrail_status=GuardrailStatus(
+                    rag_grounded=True,
+                    fallback_used=True,
+                    reason="low_confidence",
+                    critic_score=round(1.0 - confidence, 4),
+                ),
+                latency_ms=round(latency_ms, 2),
+            )
+
+        answer_body = " ".join(sentences)
+        seq_tensor = None
+
+    # Assemble answer with citations
     top_citation_refs = " ".join(
         f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
     )
-    original_answer = f"{answer_body} {top_citation_refs}"
-
-    # Extract retrieved context to evaluate Jaccard similarity fallback if no tensor
-    retrieved_context = " ".join(str(r.chunk.get("text", "")) for r in results)
+    original_answer = f"{answer_body} {top_citation_refs}".strip()
 
     # Score and enforce
     guard_res = enforcer.score_and_enforce(
@@ -488,10 +580,20 @@ def answer_query(
         retrieved_context=retrieved_context,
         generated_answer=answer_body,
         domain=domain,
+        seq_tensor=seq_tensor,
     )
 
     if guard_res["fallback_used"]:
-        answer = "I could not verify this confidently from the available source documents."
+        fallback_msg = "I could not verify this confidently from the available source documents."
+        if output_format == "drug_interaction_report":
+            import json
+            answer = json.dumps({"interactions": [], "summary_warning": fallback_msg})
+        elif output_format == "prescription_summary":
+            import json
+            answer = json.dumps({"patient_instructions": fallback_msg, "dosage_schedule": "Unknown", "side_effects": [], "requires_followup": False})
+        else:
+            import json
+            answer = json.dumps({"answer": fallback_msg, "citations": []})
         fallback_used = True
         reason = guard_res["reason"] or "critic_threshold_crossed"
     else:

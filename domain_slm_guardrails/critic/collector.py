@@ -72,6 +72,7 @@ class HiddenStateCollector:
         layer_indices: list[int] | None = None,
         max_new_tokens: int = 128,
         generation_kwargs: dict[str, Any] | None = None,
+        logits_processor: Any | None = None,
     ) -> list[dict[str, Any]]:
         """Run generation, capture hidden states, label tokens, and return critic records."""
         if torch is None:
@@ -94,6 +95,7 @@ class HiddenStateCollector:
                 return_dict_in_generate=True,
                 max_new_tokens=max_new_tokens,
                 use_cache=True,
+                logits_processor=logits_processor,
                 **generation_kwargs,
             )
 

@@ -39,3 +39,36 @@ class QueryResponse(BaseModel):
 class ThresholdUpdateRequest(BaseModel):
     domain: str
     threshold: float = Field(ge=0.0, le=1.0)
+
+
+# ---------------------------------------------------------------------------
+# Structured Output Schemas
+# ---------------------------------------------------------------------------
+
+class StructuredCitation(BaseModel):
+    citation_id: str = Field(description="The citation marker, e.g., C1")
+    text: str = Field(description="The exact text being cited")
+
+
+class AnswerWithCitations(BaseModel):
+    answer: str = Field(description="The final answered text")
+    citations: list[StructuredCitation] = Field(description="List of citations used in the answer")
+
+
+class InteractionSeverity(BaseModel):
+    drug_a: str = Field(description="The first drug name")
+    drug_b: str = Field(description="The second drug name")
+    severity: str = Field(description="Severity of interaction: Mild, Moderate, or Severe")
+    description: str = Field(description="Details of the interaction")
+
+
+class DrugInteractionReport(BaseModel):
+    interactions: list[InteractionSeverity] = Field(description="List of potential drug interactions")
+    summary_warning: str = Field(description="Overall warning summary for the physician")
+
+
+class PrescriptionSummary(BaseModel):
+    patient_instructions: str = Field(description="Instructions formatted for the patient")
+    dosage_schedule: str = Field(description="When and how to take the medication")
+    side_effects: list[str] = Field(description="List of common side effects to watch for")
+    requires_followup: bool = Field(description="Whether a follow-up appointment is recommended")
