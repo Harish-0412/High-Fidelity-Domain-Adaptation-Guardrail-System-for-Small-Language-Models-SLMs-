@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from domain_slm_guardrails.training.pipeline import run_training_pipeline
+from services.training.pipeline import run_training_pipeline
 
 
 def main() -> None:

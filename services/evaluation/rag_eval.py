@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 from statistics import mean
 
-from domain_slm_guardrails.api.rag import answer_query
-from domain_slm_guardrails.core.config import project_root
+from api.rag import answer_query
+from services.core.config import project_root
 
 
 @dataclass(frozen=True)
@@ -96,8 +96,8 @@ def evaluate_critic_on_rag(
     device: str = "cpu",
 ) -> dict[str, float]:
     """Evaluate a trained critic model on RAG queries, returning AUC, Precision, Recall, and F1."""
-    from domain_slm_guardrails.critic.collector import HiddenStateCollector
-    from domain_slm_guardrails.critic.trainer import calculate_metrics
+    from services.critic.collector import HiddenStateCollector
+    from services.critic.trainer import calculate_metrics
     import torch
 
     collector = HiddenStateCollector(model=model, tokenizer=tokenizer, device=device)
@@ -106,7 +106,7 @@ def evaluate_critic_on_rag(
     y_scores = []
     
     for case in cases:
-        from domain_slm_guardrails.retrieval.hybrid import load_hybrid_retriever
+        from retrieval.hybrid import load_hybrid_retriever
         try:
             retriever = load_hybrid_retriever(case.domain)
             retrieved = retriever.search(case.query, top_k=1)

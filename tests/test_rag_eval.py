@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from domain_slm_guardrails.evaluation.rag_eval import (
+from services.evaluation.rag_eval import (
     RAGEvalCase,
     evaluate_cases,
     summarize_results,

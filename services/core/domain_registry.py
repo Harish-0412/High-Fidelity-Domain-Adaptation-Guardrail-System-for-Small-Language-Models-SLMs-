@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from domain_slm_guardrails.core.config import load_base_config, load_simple_yaml, project_root
+from services.core.config import load_base_config, load_simple_yaml, project_root
 
 
 REQUIRED_DOMAIN_FIELDS = {

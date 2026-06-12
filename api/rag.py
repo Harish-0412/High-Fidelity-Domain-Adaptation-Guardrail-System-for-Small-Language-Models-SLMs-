@@ -5,11 +5,11 @@ import time
 from dataclasses import dataclass, field
 from typing import Sequence
 
-from domain_slm_guardrails.api.schemas import Citation, GuardrailStatus, QueryResponse
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.retrieval.hybrid import HybridResult, load_hybrid_retriever
-from domain_slm_guardrails.critic.enforcer import LiveGuardrailEnforcer
-from domain_slm_guardrails.core.config import load_base_config, project_root
+from api.schemas import Citation, GuardrailStatus, QueryResponse
+from services.core.domain_registry import get_domain_config
+from retrieval.hybrid import HybridResult, load_hybrid_retriever
+from services.critic.enforcer import LiveGuardrailEnforcer
+from services.core.config import load_base_config, project_root
 from pathlib import Path
 
 # Initialize global enforcer
@@ -30,7 +30,7 @@ except Exception:
 try:
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorList
-    from domain_slm_guardrails.critic.collector import HiddenStateCollector
+    from services.critic.collector import HiddenStateCollector
 except ImportError:
     torch = None
 
@@ -496,7 +496,7 @@ def answer_query(
         # Build Outlines Logits Processor
         lp_list = None
         if from_transformers and get_json_schema_logits_processor:
-            from domain_slm_guardrails.api.schemas import AnswerWithCitations, DrugInteractionReport, PrescriptionSummary
+            from api.schemas import AnswerWithCitations, DrugInteractionReport, PrescriptionSummary
             import json
             
             schema_map = {

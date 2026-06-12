@@ -1,4 +1,4 @@
-from domain_slm_guardrails.api.rag import answer_query
+from api.rag import answer_query
 
 print("Testing drug_interaction_report schema...")
 try:

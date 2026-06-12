@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from domain_slm_guardrails.api.main import app
-from domain_slm_guardrails.api.rag import enforcer, answer_query
-from domain_slm_guardrails.critic.enforcer import LiveGuardrailEnforcer
+from api.main import app
+from api.rag import enforcer, answer_query
+from services.critic.enforcer import LiveGuardrailEnforcer
 
 client = TestClient(app)
 

@@ -7,10 +7,10 @@ import time
 from pathlib import Path
 from typing import Any
 
-from domain_slm_guardrails.core.config import project_root
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.critic.collector import GroundednessLabeller
-from domain_slm_guardrails.critic.models import BiLSTMCritic, CNNCritic
+from services.core.config import project_root
+from services.core.domain_registry import get_domain_config
+from services.critic.collector import GroundednessLabeller
+from services.critic.models import BiLSTMCritic, CNNCritic
 
 try:
     import torch

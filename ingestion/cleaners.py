@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from domain_slm_guardrails.ingestion.loaders import DocumentPage
+from ingestion.loaders import DocumentPage
 
 
 def clean_text(text: str) -> str:

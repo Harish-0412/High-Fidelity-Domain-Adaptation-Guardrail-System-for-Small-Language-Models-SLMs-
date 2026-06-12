@@ -14,8 +14,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import torch
 from torch.utils.data import random_split
 
-from domain_slm_guardrails.critic.models import BiLSTMCritic, CNNCritic
-from domain_slm_guardrails.critic.trainer import CriticDataset, train_critic_model
+from services.critic.models import BiLSTMCritic, CNNCritic
+from services.critic.trainer import CriticDataset, train_critic_model
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

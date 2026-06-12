@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from domain_slm_guardrails.evaluation.groundedness_comparator import (
+from services.evaluation.groundedness_comparator import (
     GroundednessCase,
     GroundednessComparator,
 )

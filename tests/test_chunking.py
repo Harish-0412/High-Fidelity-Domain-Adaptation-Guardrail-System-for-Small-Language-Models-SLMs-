@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from domain_slm_guardrails.ingestion.chunkers import chunk_page
-from domain_slm_guardrails.ingestion.loaders import DocumentPage
+from ingestion.chunkers import chunk_page
+from ingestion.loaders import DocumentPage
 
 
 def test_chunks_are_stable_and_preserve_metadata():

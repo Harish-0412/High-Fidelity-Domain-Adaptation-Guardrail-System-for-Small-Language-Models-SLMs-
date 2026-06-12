@@ -6,11 +6,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.ingestion.pipeline import read_chunks_jsonl
-from domain_slm_guardrails.retrieval.bm25 import build_bm25_index
-from domain_slm_guardrails.retrieval.embeddings import load_embedding_model
-from domain_slm_guardrails.retrieval.vector_store import try_build_qdrant_store, write_local_dense_index
+from services.core.domain_registry import get_domain_config
+from ingestion.pipeline import read_chunks_jsonl
+from retrieval.bm25 import build_bm25_index
+from retrieval.embeddings import load_embedding_model
+from retrieval.vector_store import try_build_qdrant_store, write_local_dense_index
 
 
 def main() -> None:

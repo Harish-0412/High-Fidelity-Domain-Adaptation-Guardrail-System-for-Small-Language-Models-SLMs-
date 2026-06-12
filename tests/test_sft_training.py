@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from domain_slm_guardrails.training.sft_dataset import (
+from services.training.sft_dataset import (
     SFTExample,
     SFTDatasetBuilder,
     GeneralDataLoader,

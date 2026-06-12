@@ -8,8 +8,8 @@ from pathlib import Path
 torch = pytest.importorskip("torch")
 
 import torch.nn as nn
-from domain_slm_guardrails.critic.models import BiLSTMCritic, CNNCritic
-from domain_slm_guardrails.critic.trainer import (
+from services.critic.models import BiLSTMCritic, CNNCritic
+from services.critic.trainer import (
     CriticDataset,
     calculate_auc,
     calculate_metrics,

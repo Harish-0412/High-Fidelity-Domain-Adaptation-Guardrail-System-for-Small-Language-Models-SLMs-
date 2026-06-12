@@ -289,7 +289,7 @@ flowchart TD
 ## Repository Structure
 
 ```text
-domain_slm_guardrails/
+services/
   api/
     main.py          # FastAPI app
     rag.py           # Citation-bearing RAG answer logic
@@ -378,7 +378,7 @@ python scripts/query_retrieval.py --domain medical_prescription --query "When sh
 ### 4. Run The API
 
 ```bash
-uvicorn domain_slm_guardrails.api.main:app --reload --port 8000
+uvicorn api.main:app --reload --port 8000
 ```
 
 Open:
@@ -696,7 +696,7 @@ flowchart TD
 ## Repository Structure
 
 ```text
-domain_slm_guardrails/
+services/
   api/
     main.py          # FastAPI app
     rag.py           # Citation-bearing RAG answer logic
@@ -789,7 +789,7 @@ python scripts/query_retrieval.py --domain medical_billing --query "When should 
 ### 4. Run The API
 
 ```bash
-uvicorn domain_slm_guardrails.api.main:app --reload --port 8000
+uvicorn api.main:app --reload --port 8000
 ```
 
 Open:
@@ -831,12 +831,12 @@ pass_rate: 1.0
 
 | File | Why It Matters |
 |---|---|
-| `domain_slm_guardrails/api/rag.py` | Converts retrieved evidence into citation-bearing answers and fallback responses |
-| `domain_slm_guardrails/retrieval/hybrid.py` | Merges dense and sparse retrieval results |
-| `domain_slm_guardrails/retrieval/bm25.py` | Handles exact keyword/code retrieval |
-| `domain_slm_guardrails/retrieval/embeddings.py` | Controls semantic vector generation |
-| `domain_slm_guardrails/retrieval/vector_store.py` | Stores and searches dense vectors |
-| `domain_slm_guardrails/ingestion/chunkers.py` | Determines how much evidence each chunk contains |
+| `services/api/rag.py` | Converts retrieved evidence into citation-bearing answers and fallback responses |
+| `services/retrieval/hybrid.py` | Merges dense and sparse retrieval results |
+| `services/retrieval/bm25.py` | Handles exact keyword/code retrieval |
+| `services/retrieval/embeddings.py` | Controls semantic vector generation |
+| `services/retrieval/vector_store.py` | Stores and searches dense vectors |
+| `services/ingestion/chunkers.py` | Determines how much evidence each chunk contains |
 <<<<<<< HEAD
 | `data/evaluation/medical_prescription/rag_eval.jsonl` | Defines the first measurable RAG success cases |
 =======

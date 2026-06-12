@@ -15,9 +15,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.critic.collector import HiddenStateCollector
-from domain_slm_guardrails.retrieval.hybrid import load_hybrid_retriever
+from services.core.domain_registry import get_domain_config
+from services.critic.collector import HiddenStateCollector
+from retrieval.hybrid import load_hybrid_retriever
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

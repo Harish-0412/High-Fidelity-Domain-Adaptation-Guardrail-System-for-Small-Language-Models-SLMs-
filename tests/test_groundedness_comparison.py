@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from domain_slm_guardrails.evaluation.groundedness_comparator import (
+from services.evaluation.groundedness_comparator import (
     GroundednessCase,
     GroundednessComparator,
 )

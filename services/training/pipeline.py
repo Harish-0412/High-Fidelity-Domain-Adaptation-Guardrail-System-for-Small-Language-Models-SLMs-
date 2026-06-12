@@ -7,15 +7,15 @@ from typing import Optional
 import json
 import logging
 
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.ingestion.pipeline import read_chunks_jsonl
-from domain_slm_guardrails.training.sft_dataset import (
+from services.core.domain_registry import get_domain_config
+from ingestion.pipeline import read_chunks_jsonl
+from services.training.sft_dataset import (
     SFTDatasetBuilder,
     GeneralDataLoader,
 )
-from domain_slm_guardrails.training.sft_trainer import QLoRASFTTrainer, QLoRASFTConfig
-from domain_slm_guardrails.training.dpo_generator import DPOPreferenceGenerator
-from domain_slm_guardrails.training.dpo_trainer import DPOTrainer, DPOConfig
+from services.training.sft_trainer import QLoRASFTTrainer, QLoRASFTConfig
+from services.training.dpo_generator import DPOPreferenceGenerator
+from services.training.dpo_trainer import DPOTrainer, DPOConfig
 
 logger = logging.getLogger(__name__)
 

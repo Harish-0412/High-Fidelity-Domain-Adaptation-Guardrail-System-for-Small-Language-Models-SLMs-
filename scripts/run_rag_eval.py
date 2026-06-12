@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from domain_slm_guardrails.evaluation.rag_eval import (  # noqa: E402
+from services.evaluation.rag_eval import (  # noqa: E402
     default_eval_path,
     evaluate_cases,
     load_eval_cases,

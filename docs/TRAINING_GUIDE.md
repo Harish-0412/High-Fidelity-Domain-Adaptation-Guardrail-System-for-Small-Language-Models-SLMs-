@@ -59,7 +59,7 @@ Creates supervised fine-tuning datasets from domain chunks.
 
 **Example:**
 ```python
-from domain_slm_guardrails.training.sft_dataset import SFTDatasetBuilder
+from services.training.sft_dataset import SFTDatasetBuilder
 
 builder = SFTDatasetBuilder()
 
@@ -92,7 +92,7 @@ Implements efficient supervised fine-tuning using QLoRA.
 
 **Configuration:**
 ```python
-from domain_slm_guardrails.training.sft_trainer import QLoRASFTTrainer, QLoRASFTConfig
+from services.training.sft_trainer import QLoRASFTTrainer, QLoRASFTConfig
 
 config = QLoRASFTConfig(
     model_name="meta-llama/Llama-2-8b",
@@ -132,7 +132,7 @@ Creates preference pairs for DPO alignment training.
 
 **Example:**
 ```python
-from domain_slm_guardrails.training.dpo_generator import DPOPreferenceGenerator
+from services.training.dpo_generator import DPOPreferenceGenerator
 
 generator = DPOPreferenceGenerator()
 
@@ -175,7 +175,7 @@ Where:
 
 **Example:**
 ```python
-from domain_slm_guardrails.training.dpo_trainer import DPOTrainer, DPOConfig
+from services.training.dpo_trainer import DPOTrainer, DPOConfig
 
 config = DPOConfig(
     beta=0.5,
@@ -207,7 +207,7 @@ End-to-end orchestration combining SFT and DPO.
 
 **Example:**
 ```python
-from domain_slm_guardrails.training.pipeline import run_training_pipeline
+from services.training.pipeline import run_training_pipeline
 
 results = run_training_pipeline(
     domain_id="medical_prescription",
@@ -238,7 +238,7 @@ Evaluates model performance on benchmark cases.
 
 **Example:**
 ```python
-from domain_slm_guardrails.evaluation.baseline_eval import BaselineModelEvaluator
+from services.evaluation.baseline_eval import BaselineModelEvaluator
 
 # Evaluate single model
 evaluator = BaselineModelEvaluator("meta-llama/Llama-2-8b")
@@ -246,7 +246,7 @@ results = evaluator.evaluate_cases(eval_cases)
 summary = evaluator.summarize_results(results)
 
 # Compare multiple models
-from domain_slm_guardrails.evaluation.baseline_eval import MultiModelComparison
+from services.evaluation.baseline_eval import MultiModelComparison
 
 models = {
     "base": "meta-llama/Llama-2-8b",
@@ -277,7 +277,7 @@ Compares SFT baseline vs DPO policy on groundedness metrics.
 
 **Example:**
 ```python
-from domain_slm_guardrails.evaluation.groundedness_comparator import (
+from services.evaluation.groundedness_comparator import (
     GroundednessCase,
     GroundednessComparator,
 )

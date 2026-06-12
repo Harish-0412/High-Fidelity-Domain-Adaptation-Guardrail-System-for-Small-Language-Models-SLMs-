@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 import re
 
-from domain_slm_guardrails.ingestion.loaders import DocumentPage
+from ingestion.loaders import DocumentPage
 
 
 TOKEN_RE = re.compile(r"\S+")

@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from domain_slm_guardrails.training.sft_dataset import (
+from services.training.sft_dataset import (
     SFTDatasetBuilder,
     GeneralDataLoader,
 )
-from domain_slm_guardrails.training.dpo_generator import DPOPreferenceGenerator
+from services.training.dpo_generator import DPOPreferenceGenerator
 
 
 def test_sft_to_dpo_pipeline():
@@ -130,7 +130,7 @@ def test_dpo_rejection_quality():
 
 def test_dpo_export_formats():
     """Test both DPO export formats."""
-    from domain_slm_guardrails.training.dpo_generator import DPOPreferencePair
+    from services.training.dpo_generator import DPOPreferencePair
 
     pairs = [
         DPOPreferencePair(
@@ -160,7 +160,7 @@ def test_dpo_export_formats():
 
 def test_groundedness_metrics_calculation():
     """Test that groundedness metrics are correctly calculated."""
-    from domain_slm_guardrails.evaluation.groundedness_comparator import (
+    from services.evaluation.groundedness_comparator import (
         GroundednessCase,
         GroundednessComparator,
     )

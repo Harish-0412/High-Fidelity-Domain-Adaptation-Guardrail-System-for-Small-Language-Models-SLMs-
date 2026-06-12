@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from domain_slm_guardrails.api.rag import answer_query
+from api.rag import answer_query
 
 
 def test_answer_query_returns_citations():

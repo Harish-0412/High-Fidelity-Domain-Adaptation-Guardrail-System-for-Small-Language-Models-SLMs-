@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from domain_slm_guardrails.core.domain_registry import DomainConfig
-from domain_slm_guardrails.ingestion.chunkers import DocumentChunk, chunk_page
-from domain_slm_guardrails.ingestion.cleaners import clean_page
-from domain_slm_guardrails.ingestion.loaders import discover_documents, load_document
+from services.core.domain_registry import DomainConfig
+from ingestion.chunkers import DocumentChunk, chunk_page
+from ingestion.cleaners import clean_page
+from ingestion.loaders import discover_documents, load_document
 
 
 def ingest_domain(domain: DomainConfig) -> list[DocumentChunk]:

@@ -7,10 +7,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.retrieval.bm25 import BM25Index
-from domain_slm_guardrails.retrieval.hybrid import HybridRetriever
-from domain_slm_guardrails.retrieval.vector_store import LocalDenseIndex
+from services.core.domain_registry import get_domain_config
+from retrieval.bm25 import BM25Index
+from retrieval.hybrid import HybridRetriever
+from retrieval.vector_store import LocalDenseIndex
 
 
 def main() -> None:

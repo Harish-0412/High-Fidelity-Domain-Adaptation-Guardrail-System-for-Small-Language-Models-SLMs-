@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 from fastapi import FastAPI, HTTPException
 
-from domain_slm_guardrails.api.rag import answer_query
-from domain_slm_guardrails.api.schemas import QueryRequest, QueryResponse, ThresholdUpdateRequest
-from domain_slm_guardrails.core.domain_registry import list_domains, get_domain_config
+from api.rag import answer_query
+from api.schemas import QueryRequest, QueryResponse, ThresholdUpdateRequest
+from services.core.domain_registry import list_domains, get_domain_config
 
 
 app = FastAPI(
@@ -36,7 +36,7 @@ def query(request: QueryRequest) -> QueryResponse:
 
 @app.get("/guardrail/thresholds")
 def get_thresholds() -> dict[str, float]:
-    from domain_slm_guardrails.api.rag import enforcer
+    from api.rag import enforcer
     res = {}
     for d in list_domains():
         if d in enforcer.runtime_threshold_overrides:
@@ -51,7 +51,7 @@ def get_thresholds() -> dict[str, float]:
 
 @app.post("/guardrail/thresholds")
 def update_threshold(req: ThresholdUpdateRequest) -> dict[str, object]:
-    from domain_slm_guardrails.api.rag import enforcer
+    from api.rag import enforcer
     try:
         get_domain_config(req.domain)
     except ValueError as exc:
@@ -67,20 +67,20 @@ def update_threshold(req: ThresholdUpdateRequest) -> dict[str, object]:
 
 @app.get("/guardrail/metrics")
 def get_metrics() -> dict[str, object]:
-    from domain_slm_guardrails.api.rag import enforcer
+    from api.rag import enforcer
     return enforcer.get_metrics()
 
 
 @app.post("/guardrail/metrics/reset")
 def reset_metrics() -> dict[str, object]:
-    from domain_slm_guardrails.api.rag import enforcer
+    from api.rag import enforcer
     enforcer.reset_metrics()
     return {"status": "success", "message": "Metrics reset successfully"}
 
 
 @app.get("/guardrail/logs")
 def get_logs(limit: int = 50) -> list[dict[str, object]]:
-    from domain_slm_guardrails.api.rag import enforcer
+    from api.rag import enforcer
     log_path = enforcer.audit_log_path
     if not log_path.exists():
         return []

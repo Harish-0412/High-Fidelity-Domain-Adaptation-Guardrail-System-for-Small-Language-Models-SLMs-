@@ -6,7 +6,7 @@ import pytest
 torch = pytest.importorskip("torch")
 from pathlib import Path
 
-from domain_slm_guardrails.critic.collector import GroundednessLabeller, HiddenStateCollector
+from services.critic.collector import GroundednessLabeller, HiddenStateCollector
 
 
 # ---------------------------------------------------------------------------
@@ -64,7 +64,10 @@ class MockTokenizer:
 
     def __call__(self, text, return_tensors=None, **kwargs):
         input_ids = torch.arange(1, 7, dtype=torch.long).unsqueeze(0)  # Length 6 prompt
-        return {"input_ids": input_ids}
+        class MockBatchEncoding(dict):
+            def to(self, device):
+                return self
+        return MockBatchEncoding({"input_ids": input_ids})
 
     def decode(self, token_ids, skip_special_tokens=False):
         if isinstance(token_ids, (list, tuple, torch.Tensor)):

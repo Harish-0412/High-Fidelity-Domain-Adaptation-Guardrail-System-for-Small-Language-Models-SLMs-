@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from domain_slm_guardrails.retrieval.bm25 import build_bm25_index
-from domain_slm_guardrails.retrieval.embeddings import HashingEmbeddingModel
-from domain_slm_guardrails.retrieval.hybrid import merge_results
-from domain_slm_guardrails.retrieval.vector_store import DenseResult, LocalDenseIndex
+from retrieval.bm25 import build_bm25_index
+from retrieval.embeddings import HashingEmbeddingModel
+from retrieval.hybrid import merge_results
+from retrieval.vector_store import DenseResult, LocalDenseIndex
 
 
 def _chunks():

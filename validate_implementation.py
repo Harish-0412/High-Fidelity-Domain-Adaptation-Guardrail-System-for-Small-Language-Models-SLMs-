@@ -14,27 +14,27 @@ def test_imports():
         print("Testing imports...")
         
         print("  ✓ Importing SFT dataset builder...", end="")
-        from domain_slm_guardrails.training.sft_dataset import SFTDatasetBuilder, GeneralDataLoader
+        from services.training.sft_dataset import SFTDatasetBuilder, GeneralDataLoader
         print(" OK")
         
         print("  ✓ Importing SFT trainer...", end="")
-        from domain_slm_guardrails.training.sft_trainer import QLoRASFTTrainer, QLoRASFTConfig
+        from services.training.sft_trainer import QLoRASFTTrainer, QLoRASFTConfig
         print(" OK")
         
         print("  ✓ Importing DPO generator...", end="")
-        from domain_slm_guardrails.training.dpo_generator import DPOPreferenceGenerator, DPOPreferencePair
+        from services.training.dpo_generator import DPOPreferenceGenerator, DPOPreferencePair
         print(" OK")
         
         print("  ✓ Importing DPO trainer...", end="")
-        from domain_slm_guardrails.training.dpo_trainer import DPOTrainer, DPOConfig
+        from services.training.dpo_trainer import DPOTrainer, DPOConfig
         print(" OK")
         
         print("  ✓ Importing training pipeline...", end="")
-        from domain_slm_guardrails.training.pipeline import TrainingPipeline, run_training_pipeline
+        from services.training.pipeline import TrainingPipeline, run_training_pipeline
         print(" OK")
         
         print("  ✓ Importing baseline evaluator...", end="")
-        from domain_slm_guardrails.evaluation.baseline_eval import (
+        from services.evaluation.baseline_eval import (
             BaselineModelEvaluator,
             MultiModelComparison,
             ModelEvalCase,
@@ -42,18 +42,18 @@ def test_imports():
         print(" OK")
         
         print("  ✓ Importing groundedness comparator...", end="")
-        from domain_slm_guardrails.evaluation.groundedness_comparator import (
+        from services.evaluation.groundedness_comparator import (
             GroundednessComparator,
             GroundednessCase,
         )
         print(" OK")
         
         print("  ✓ Importing GroundednessLabeller, HiddenStateCollector & LiveGuardrailEnforcer...", end="")
-        from domain_slm_guardrails.critic import GroundednessLabeller, HiddenStateCollector, LiveGuardrailEnforcer
+        from services.critic import GroundednessLabeller, HiddenStateCollector, LiveGuardrailEnforcer
         print(" OK")
         
         print("  ✓ Importing Critic Models & Trainer API...", end="")
-        from domain_slm_guardrails.critic import BiLSTMCritic, CNNCritic, CriticDataset, train_critic_model
+        from services.critic import BiLSTMCritic, CNNCritic, CriticDataset, train_critic_model
         print(" OK")
         
         print("\n✅ All modules imported successfully!")
@@ -72,7 +72,7 @@ def test_basic_functionality():
         print("\nTesting basic functionality...")
         
         print("  ✓ Testing SFTExample...", end="")
-        from domain_slm_guardrails.training.sft_dataset import SFTExample
+        from services.training.sft_dataset import SFTExample
         ex = SFTExample(
             id="test_1",
             query="What is X?",
@@ -82,7 +82,7 @@ def test_basic_functionality():
         print(" OK")
         
         print("  ✓ Testing SFTDatasetBuilder...", end="")
-        from domain_slm_guardrails.training.sft_dataset import SFTDatasetBuilder
+        from services.training.sft_dataset import SFTDatasetBuilder
         builder = SFTDatasetBuilder()
         chunks = [{"text": "Sample text", "chunk_id": "c1", "source_id": "doc1"}]
         examples = builder.create_from_chunks(chunks)
@@ -90,7 +90,7 @@ def test_basic_functionality():
         print(" OK")
         
         print("  ✓ Testing DPOPreferenceGenerator...", end="")
-        from domain_slm_guardrails.training.dpo_generator import DPOPreferenceGenerator
+        from services.training.dpo_generator import DPOPreferenceGenerator
         gen = DPOPreferenceGenerator()
         sft_ex = [{"query": "Q", "chosen": "A", "citations": []}]
         pairs = gen.generate_from_sft_examples(sft_ex)
@@ -98,7 +98,7 @@ def test_basic_functionality():
         print(" OK")
         
         print("  ✓ Testing GroundednessCase...", end="")
-        from domain_slm_guardrails.evaluation.groundedness_comparator import GroundednessCase
+        from services.evaluation.groundedness_comparator import GroundednessCase
         case = GroundednessCase(
             id="c1",
             query="Q?",
@@ -113,7 +113,7 @@ def test_basic_functionality():
         print(" OK")
 
         print("  ✓ Testing GroundednessLabeller...", end="")
-        from domain_slm_guardrails.critic import GroundednessLabeller
+        from services.critic import GroundednessLabeller
         labeller = GroundednessLabeller()
         res = labeller.label_sentences("Word. Other.", "Word")
         assert len(res) == 2
@@ -122,7 +122,7 @@ def test_basic_functionality():
         print(" OK")
 
         print("  ✓ Testing LiveGuardrailEnforcer...", end="")
-        from domain_slm_guardrails.critic import LiveGuardrailEnforcer
+        from services.critic import LiveGuardrailEnforcer
         enforcer = LiveGuardrailEnforcer()
         res = enforcer.score_and_enforce("q", "context word", "context word", "medical_prescription")
         assert res["critic_score"] == 0.0
@@ -130,7 +130,7 @@ def test_basic_functionality():
         print(" OK")
 
         print("  ✓ Testing BiLSTMCritic & CNNCritic...", end="")
-        from domain_slm_guardrails.critic import BiLSTMCritic, CNNCritic
+        from services.critic import BiLSTMCritic, CNNCritic
         try:
             import torch
         except ImportError:

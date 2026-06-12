@@ -35,10 +35,10 @@ def main():
     # Check new modules
     print_section("NEW TRAINING MODULES")
     modules = [
-        ("SFT Dataset Builder", "domain_slm_guardrails/training/sft_dataset.py"),
-        ("QLoRA SFT Trainer", "domain_slm_guardrails/training/sft_trainer.py"),
-        ("DPO Trainer (Complete)", "domain_slm_guardrails/training/dpo_trainer.py"),
-        ("Training Pipeline", "domain_slm_guardrails/training/pipeline.py"),
+        ("SFT Dataset Builder", "services/training/sft_dataset.py"),
+        ("QLoRA SFT Trainer", "services/training/sft_trainer.py"),
+        ("DPO Trainer (Complete)", "services/training/dpo_trainer.py"),
+        ("Training Pipeline", "services/training/pipeline.py"),
     ]
     for name, path in modules:
         full_path = project_root / path
@@ -46,8 +46,8 @@ def main():
     
     print_section("NEW EVALUATION MODULES")
     modules = [
-        ("Baseline Model Evaluator", "domain_slm_guardrails/evaluation/baseline_eval.py"),
-        ("Groundedness Comparator (Enhanced)", "domain_slm_guardrails/evaluation/groundedness_comparator.py"),
+        ("Baseline Model Evaluator", "services/evaluation/baseline_eval.py"),
+        ("Groundedness Comparator (Enhanced)", "services/evaluation/groundedness_comparator.py"),
     ]
     for name, path in modules:
         full_path = project_root / path
@@ -87,8 +87,8 @@ def main():
     print_section("CONFIGURATION UPDATES")
     updates = [
         ("pyproject.toml with training/eval deps", "pyproject.toml"),
-        ("Training __init__.py", "domain_slm_guardrails/training/__init__.py"),
-        ("Evaluation __init__.py", "domain_slm_guardrails/evaluation/__init__.py"),
+        ("Training __init__.py", "services/training/__init__.py"),
+        ("Evaluation __init__.py", "services/evaluation/__init__.py"),
     ]
     for name, path in updates:
         full_path = project_root / path

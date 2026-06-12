@@ -286,7 +286,7 @@ python scripts/run_groundedness_comparison.py \
 ## 📁 File Structure
 
 ```
-domain_slm_guardrails/
+services/
 ├── training/
 │   ├── sft_dataset.py      ✅ NEW
 │   ├── sft_trainer.py      ✅ NEW

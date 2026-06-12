@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from domain_slm_guardrails.core.domain_registry import get_domain_config, list_domains
+from services.core.domain_registry import get_domain_config, list_domains
 
 
 def test_medical_prescription_config_loads():

@@ -6,8 +6,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.ingestion.pipeline import run_ingestion
+from services.core.domain_registry import get_domain_config
+from ingestion.pipeline import run_ingestion
 
 
 def main() -> None:

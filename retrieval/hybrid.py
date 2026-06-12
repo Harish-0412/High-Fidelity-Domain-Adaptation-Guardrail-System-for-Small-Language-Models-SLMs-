@@ -5,10 +5,10 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Callable
 
-from domain_slm_guardrails.core.domain_registry import get_domain_config
-from domain_slm_guardrails.retrieval.bm25 import BM25Index
-from domain_slm_guardrails.retrieval.embeddings import load_embedding_model
-from domain_slm_guardrails.retrieval.vector_store import DenseResult, LocalDenseIndex
+from services.core.domain_registry import get_domain_config
+from retrieval.bm25 import BM25Index
+from retrieval.embeddings import load_embedding_model
+from retrieval.vector_store import DenseResult, LocalDenseIndex
 
 
 # ---------------------------------------------------------------------------

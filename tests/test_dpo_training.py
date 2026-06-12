@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from domain_slm_guardrails.training.dpo_generator import (
+from services.training.dpo_generator import (
     DPOPreferencePair,
     DPOPreferenceGenerator,
 )
