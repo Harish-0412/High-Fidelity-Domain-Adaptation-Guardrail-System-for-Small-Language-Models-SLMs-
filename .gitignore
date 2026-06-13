@@ -10,4 +10,5 @@ env/
 .DS_Store
 .vscode/
 .idea/
+test_*.py
 
