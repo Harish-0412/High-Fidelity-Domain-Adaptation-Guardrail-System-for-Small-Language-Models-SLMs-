@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Sequence, Tuple
 
 from domain_slm_guardrails.api.schemas import Citation
-from domain_slm_guardrails.llm import LLMConfig, OllamaClient, PromptTemplates
+from domain_slm_guardrails.llm import LLMConfig, GroqClient, PromptTemplates
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -33,11 +33,11 @@ class GenerationResult:
 class RAGGenerator:
     def __init__(
         self,
-        llm_client: OllamaClient | None = None,
+        llm_client: GroqClient | None = None,
         generation_config: GenerationConfig | None = None,
         llm_config: LLMConfig | None = None,
     ):
-        self.llm_client = llm_client or OllamaClient(llm_config)
+        self.llm_client = llm_client or GroqClient(llm_config)
         self.generation_config = generation_config or GenerationConfig()
         logger.info(
             f"RAGGenerator initialized with model: {self.llm_client.config.model}"

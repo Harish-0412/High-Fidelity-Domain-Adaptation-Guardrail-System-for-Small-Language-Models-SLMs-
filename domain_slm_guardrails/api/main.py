@@ -8,6 +8,12 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from domain_slm_guardrails.api.rag import answer_query
 from domain_slm_guardrails.api.schemas import (
     AgentPlanRequest,
@@ -17,6 +23,7 @@ from domain_slm_guardrails.api.schemas import (
     ThresholdUpdateRequest,
     VoiceAgentConfig,
 )
+from domain_slm_guardrails.llm import LLMConfig
 from domain_slm_guardrails.agent.service import AgenticRAGService
 
 _agentic_service = AgenticRAGService()
@@ -118,10 +125,16 @@ def agent_run(request: QueryRequest) -> QueryResponse:
 @app.post("/query", response_model=QueryResponse)
 def query(request: QueryRequest) -> QueryResponse:
     try:
+        llm_config = LLMConfig(
+            api_key=os.getenv("GROQ_API_KEY"),
+            model="llama-3.1-8b-instant",
+            temperature=0.3,
+        )
         return answer_query(
             domain=request.domain,
             query=request.query,
             top_k=request.top_k,
+            llm_config=llm_config,
         )
     except FileNotFoundError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc

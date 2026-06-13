@@ -18,6 +18,7 @@ retrieval = [
 ]
 llm = [
   "ollama>=0.3.0",
+  "groq>=0.9.0",
 ]
 dev = [
   "pytest>=8.0.0",

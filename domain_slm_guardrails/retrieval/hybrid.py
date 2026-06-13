@@ -341,9 +341,9 @@ def load_hybrid_retriever(domain_id: str) -> HybridRetriever:
             embedding_model_name=str(settings["embedding_model"]),
             embedding_dimension=int(settings["dense_vector_size"]),
             candidate_multiplier=int(settings.get("candidate_multiplier", 5)),
-            use_rrf=bool(settings.get("use_rrf", True)),
+            use_rrf=False,
             rrf_k=int(settings.get("rrf_k", 60)),
-            dense_weight=float(settings.get("dense_weight", 0.6)),
+            dense_weight=0.0,  # Only use BM25 scores now!
             preprocessor=preprocessor,
             reranker=reranker,
             use_mmr=bool(settings.get("use_mmr", False)),

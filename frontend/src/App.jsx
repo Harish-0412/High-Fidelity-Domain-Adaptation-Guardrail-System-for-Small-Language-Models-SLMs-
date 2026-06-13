@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 
 import DotGrid from './components/ui/DotGrid.jsx';
 import CardNav from './components/ui/CardNav.jsx';
@@ -6,17 +7,20 @@ import ElevenLabsVoiceAgent from './components/ElevenLabsVoiceAgent.jsx';
 import ScrollStack, { ScrollStackItem } from './components/ui/ScrollStack.jsx';
 import logo from './assets/logo.svg';
 
+import Onboarding from './pages/Onboarding.jsx';
+import Assistant from './pages/Assistant.jsx';
+
 const rotatingWords = ['Assistant', 'Advisor', 'Navigator', 'Companion'];
 
 const navItems = [
   {
-    label: 'Assisstant',
+    label: 'Assistant',
     bgColor: '#111111',
     textColor: '#ffffff',
     links: [
       {
         label: 'Ask prescriptions',
-        href: '#assistant',
+        href: '/assistant',
         ariaLabel: 'Open assistant prescription guidance',
       },
       {
@@ -119,7 +123,18 @@ function RotatingText() {
   );
 }
 
-function App() {
+function LandingPage() {
+  const navigate = useNavigate();
+
+  const handleStart = () => {
+    const hasProfile = localStorage.getItem('userProfile');
+    if (hasProfile) {
+      navigate('/assistant');
+    } else {
+      navigate('/onboarding');
+    }
+  };
+
   return (
     <main className="landing-page">
       <div className="dot-background" aria-hidden="true">
@@ -158,9 +173,9 @@ function App() {
             guidance, retrieval-backed answers, and safer healthcare workflows.
           </p>
           <div className="hero-actions">
-            <a className="primary-action" href="#demo">
+            <button onClick={handleStart} className="primary-action" style={{ cursor: 'pointer' }}>
               Start exploring
-            </a>
+            </button>
             <a className="secondary-action" href="#safety">
               View safety model
             </a>
@@ -240,6 +255,16 @@ function App() {
 
       <ElevenLabsVoiceAgent />
     </main>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/assistant" element={<Assistant />} />
+    </Routes>
   );
 }
 

@@ -11,4 +11,7 @@ env/
 .vscode/
 .idea/
 test_*.py
+.env
+*.env
+build/
 
