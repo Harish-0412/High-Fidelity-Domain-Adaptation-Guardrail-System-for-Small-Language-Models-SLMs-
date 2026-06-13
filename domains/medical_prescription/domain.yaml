@@ -1,0 +1,20 @@
+domain_id: medical_prescription
+name: Medical Prescriptions and Medications
+corpus_path: data/raw/medical_prescription
+processed_path: data/processed/medical_prescription
+index_path: data/indexes/medical_prescription
+index_name: medical_prescription_chunks
+settings:
+  embedding_model: local-hashing
+  dense_vector_size: 384
+  chunk_size: 512
+  chunk_overlap: 64
+  candidate_multiplier: 5
+  use_rrf: true
+  rrf_k: 60
+  dense_weight: 0.6
+  use_query_preprocessor: true
+  use_cross_encoder_reranker: false
+  cross_encoder_model: cross-encoder/ms-marco-MiniLM-L-12-v2
+  use_mmr: false
+  mmr_lambda: 0.6

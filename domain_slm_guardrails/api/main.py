@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from domain_slm_guardrails.api.rag import answer_query
 from domain_slm_guardrails.api.schemas import QueryRequest, QueryResponse
@@ -11,6 +12,15 @@ app = FastAPI(
     title="Domain SLM Guardrails RAG API",
     version="0.2.0",
     description="Week 2 baseline RAG API with citation-bearing responses.",
+)
+
+# Add CORS middleware for frontend access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for development, restrict in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

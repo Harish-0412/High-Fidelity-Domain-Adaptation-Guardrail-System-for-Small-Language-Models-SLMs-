@@ -3,12 +3,15 @@ from __future__ import annotations
 import threading
 from dataclasses import dataclass, field
 from functools import lru_cache
-from typing import Callable
+from typing import Callable, Optional
 
 from domain_slm_guardrails.core.domain_registry import get_domain_config
 from domain_slm_guardrails.retrieval.bm25 import BM25Index
 from domain_slm_guardrails.retrieval.embeddings import load_embedding_model
 from domain_slm_guardrails.retrieval.vector_store import DenseResult, LocalDenseIndex
+from domain_slm_guardrails.retrieval.preprocessor import QueryPreprocessor, ProcessedQuery
+from domain_slm_guardrails.retrieval.reranker import CrossEncoderReranker
+from domain_slm_guardrails.retrieval.diversity import mmr_rerank
 
 
 # ---------------------------------------------------------------------------
@@ -187,6 +190,9 @@ class HybridRetriever:
     * ``candidate_multiplier`` is now a per-retriever setting, not a search arg.
     * Thread-safe: encoding and index search are stateless; the only shared
       mutable state is the lru_cache at module level (protected by GIL).
+    * Query preprocessor: cleans and expands queries.
+    * Cross-encoder reranking: re-scores results for better relevance.
+    * MMR diversity: balances relevance and diverse information.
     """
 
     def __init__(
@@ -199,6 +205,10 @@ class HybridRetriever:
         use_rrf: bool = True,
         rrf_k: int = 60,
         dense_weight: float = 0.6,
+        preprocessor: Optional[QueryPreprocessor] = None,
+        reranker: Optional[CrossEncoderReranker] = None,
+        use_mmr: bool = False,
+        mmr_lambda: float = 0.6,
     ):
         self.dense_index = dense_index
         self.bm25_index = bm25_index
@@ -210,12 +220,18 @@ class HybridRetriever:
         self.use_rrf = use_rrf
         self.rrf_k = rrf_k
         self.dense_weight = dense_weight
+        self.preprocessor = preprocessor
+        self.reranker = reranker
+        self.use_mmr = use_mmr
+        self.mmr_lambda = mmr_lambda
 
     def search(
         self,
         query: str,
         top_k: int = 5,
         expanded_query: str | None = None,
+        use_reranking: bool = True,
+        use_mmr: bool | None = None,
     ) -> list[HybridResult]:
         """
         Retrieve top_k results for ``query``.
@@ -225,25 +241,59 @@ class HybridRetriever:
             expanded_query: Optional rewritten/expanded query string.  If
                             provided, BM25 uses it while dense uses the
                             original (preserving semantic precision).
+            use_reranking:  Whether to use cross-encoder reranking if available.
+            use_mmr:        Whether to use MMR diversity, overrides instance-level setting.
         """
+        # Process query with preprocessor if available
+        processed_query: Optional[ProcessedQuery] = None
+        if self.preprocessor:
+            processed_query = self.preprocessor.preprocess(query)
+            bm25_query = processed_query.expanded
+        else:
+            bm25_query = expanded_query if expanded_query else query
+
         candidate_k = max(top_k, top_k * self.candidate_multiplier)
 
         # Dense: encode original query for best semantic precision
         query_vector = self.embedding_model.encode([query])[0]
         dense_results = self.dense_index.search(query_vector, top_k=candidate_k)
 
-        # BM25: use expanded query if provided, else original
-        bm25_query = expanded_query if expanded_query else query
+        # BM25: use expanded query
         bm25_results = self.bm25_index.search(bm25_query, top_k=candidate_k)
 
-        return merge_results(
+        # Initial merge
+        initial_results = merge_results(
             dense_results,
             bm25_results,
-            top_k=top_k,
+            top_k=candidate_k,
             dense_weight=self.dense_weight,
             use_rrf=self.use_rrf,
             rrf_k=self.rrf_k,
         )
+
+        # Convert to chunks for further processing
+        chunks = [result.chunk for result in initial_results]
+
+        # Apply cross-encoder reranking if available
+        if self.reranker and use_reranking:
+            chunks = self.reranker.rerank(query, chunks, top_k=candidate_k)
+
+        # Apply MMR diversity
+        if use_mmr is None:
+            use_mmr = self.use_mmr
+        if use_mmr:
+            chunks = mmr_rerank(chunks, query, lambda_param=self.mmr_lambda, top_k=top_k)
+
+        # Return top_k
+        # First, create a map from chunk_id to original HybridResult
+        result_map = {str(r.chunk["chunk_id"]): r for r in initial_results}
+        final_results = []
+        for chunk in chunks[:top_k]:
+            chunk_id = str(chunk["chunk_id"])
+            if chunk_id in result_map:
+                final_results.append(result_map[chunk_id])
+
+        return final_results
 
 
 # ---------------------------------------------------------------------------
@@ -270,6 +320,21 @@ def load_hybrid_retriever(domain_id: str) -> HybridRetriever:
         dense = LocalDenseIndex.load(domain.dense_index_path)
 
         settings = domain.settings
+        
+        # Preprocessor
+        preprocessor = None
+        if bool(settings.get("use_query_preprocessor", True)):
+            preprocessor = QueryPreprocessor(domain=domain_id)
+            
+        # Reranker
+        reranker = None
+        if bool(settings.get("use_cross_encoder_reranker", False)):
+            cross_encoder_model = str(settings.get("cross_encoder_model", "cross-encoder/ms-marco-MiniLM-L-12-v2"))
+            try:
+                reranker = CrossEncoderReranker(model_name=cross_encoder_model)
+            except Exception:
+                pass
+                
         return HybridRetriever(
             dense_index=dense,
             bm25_index=bm25,
@@ -279,4 +344,8 @@ def load_hybrid_retriever(domain_id: str) -> HybridRetriever:
             use_rrf=bool(settings.get("use_rrf", True)),
             rrf_k=int(settings.get("rrf_k", 60)),
             dense_weight=float(settings.get("dense_weight", 0.6)),
+            preprocessor=preprocessor,
+            reranker=reranker,
+            use_mmr=bool(settings.get("use_mmr", False)),
+            mmr_lambda=float(settings.get("mmr_lambda", 0.6)),
         )

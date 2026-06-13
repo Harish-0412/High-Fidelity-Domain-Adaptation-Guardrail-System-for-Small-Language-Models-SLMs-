@@ -1,6 +1,6 @@
 [project]
 name = "domain-slm-guardrails"
-version = "0.1.0"
+version = "0.2.0"
 description = "Generic domain retrieval core for guardrailed small language model systems."
 requires-python = ">=3.10"
 dependencies = []
@@ -16,9 +16,15 @@ retrieval = [
   "PyYAML>=6.0.0",
   "PyMuPDF>=1.24.0",
 ]
+llm = [
+  "ollama>=0.3.0",
+]
 dev = [
   "pytest>=8.0.0",
 ]
+
+[tool.setuptools]
+packages = ["domain_slm_guardrails"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

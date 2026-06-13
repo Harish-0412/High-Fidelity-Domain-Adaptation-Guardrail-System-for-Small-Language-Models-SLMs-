@@ -1,9 +1,20 @@
 embedding_model: local-hashing
 production_embedding_model: BAAI/bge-large-en-v1.5
-chunk_size_tokens: 512
-chunk_overlap_tokens: 80
+chunk_size_tokens: 256
+chunk_overlap_tokens: 50
 vector_store: qdrant
 bm25_enabled: true
 qdrant_url: http://localhost:6333
 dense_vector_size: 384
+
+# LLM Configuration
+llm:
+  provider: ollama
+  model: llama3.2
+  base_url: http://localhost:11434
+  temperature: 0.7
+  max_tokens: 1024
+  top_p: 0.9
+  top_k: 40
+  use_generation: true
 

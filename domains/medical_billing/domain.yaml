@@ -1,7 +1,0 @@
-domain_id: medical_billing
-name: Medical Billing
-corpus_path: data/raw/medical_billing
-processed_path: data/processed/medical_billing
-index_path: data/indexes/medical_billing
-index_name: medical_billing_chunks
-
