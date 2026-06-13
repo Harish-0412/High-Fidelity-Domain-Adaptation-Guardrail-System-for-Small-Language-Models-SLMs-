@@ -10,11 +10,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from domain_slm_guardrails.api.rag import answer_query
 from domain_slm_guardrails.api.schemas import (
+    AgentPlanRequest,
+    AgentPlanResponse,
     QueryRequest,
     QueryResponse,
     ThresholdUpdateRequest,
     VoiceAgentConfig,
 )
+from domain_slm_guardrails.agent.service import AgenticRAGService
+
+_agentic_service = AgenticRAGService()
 from domain_slm_guardrails.core.domain_registry import list_domains, get_domain_config
 
 
@@ -73,6 +78,41 @@ def get_voice_agent() -> VoiceAgentConfig:
             "border_color": widget_settings.get("border_color"),
         },
     )
+
+
+@app.get("/agent/tools")
+def list_agent_tools() -> list[dict[str, str]]:
+    return [{"name": t.name, "description": t.description} for t in _agentic_service.registry.list_tools()]
+
+
+@app.post("/agent/plan", response_model=AgentPlanResponse)
+def agent_plan(request: AgentPlanRequest) -> AgentPlanResponse:
+    try:
+        return _agentic_service.describe_plan(
+            domain=request.domain,
+            query=request.query,
+            top_k=request.top_k,
+            include_outputs=request.include_outputs,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/agent/run", response_model=QueryResponse)
+def agent_run(request: QueryRequest) -> QueryResponse:
+    try:
+        execution = _agentic_service.run(
+            domain=request.domain,
+            query=request.query,
+            top_k=request.top_k,
+        )
+        return execution.response
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/query", response_model=QueryResponse)
