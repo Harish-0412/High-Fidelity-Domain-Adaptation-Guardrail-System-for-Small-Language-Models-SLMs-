@@ -10,6 +10,9 @@ from domain_slm_guardrails.core.domain_registry import get_domain_config
 from domain_slm_guardrails.retrieval.hybrid import HybridResult, load_hybrid_retriever
 from domain_slm_guardrails.critic.enforcer import LiveGuardrailEnforcer
 from domain_slm_guardrails.core.config import load_base_config, project_root
+from domain_slm_guardrails.llm.ollama_client import OllamaClient
+from domain_slm_guardrails.llm.hf_client import HFClient
+from domain_slm_guardrails.llm.prompt_templates import MedicalPrescriptionTemplates
 from pathlib import Path
 
 # Initialize global enforcer
@@ -44,6 +47,45 @@ except ImportError:
 _hf_model = None
 _hf_tokenizer = None
 _collector = None
+
+# LLM client for generation
+_llm_client = None
+_llm_client_type = None  # "ollama" or "hf"
+
+
+def get_llm_client():
+    """Get or create the LLM client for generation."""
+    global _llm_client, _llm_client_type
+
+    if _llm_client is not None:
+        return _llm_client
+
+    try:
+        base_cfg = load_base_config()
+        llm_config = base_cfg.get("llm", {})
+        llm_type = llm_config.get("type", "ollama")  # Default to Ollama
+
+        if llm_type == "ollama":
+            model = llm_config.get("model", "llama3.2")
+            base_url = llm_config.get("base_url", "http://localhost:11434")
+            _llm_client = OllamaClient(model=model, base_url=base_url)
+            _llm_client_type = "ollama"
+            print(f"Initialized Ollama client with model: {model}")
+        elif llm_type == "hf":
+            model = llm_config.get("model", "Qwen/Qwen2.5-3B")
+            device = llm_config.get("device", "auto")
+            _llm_client = HFClient(model_name=model, device=device)
+            _llm_client_type = "hf"
+            print(f"Initialized HF client with model: {model}")
+        else:
+            print(f"Unknown LLM type: {llm_type}, defaulting to Ollama")
+            _llm_client = OllamaClient()
+            _llm_client_type = "ollama"
+
+        return _llm_client
+    except Exception as e:
+        print(f"Failed to initialize LLM client: {e}")
+        return None
 
 def get_collector():
     global _hf_model, _hf_tokenizer, _collector
@@ -487,49 +529,96 @@ def answer_query(
     # -----------------------------------------------------------------------
     citations = _make_citations(results, config.max_citation_chars)
     retrieved_context = "\n".join(str(r.chunk.get("text", "")) for r in results)
-    
-    collector = get_collector()
-    if collector:
-        layer_index = enforcer.critic_metadata.get("layer_index")
-        layer_indices = [layer_index] if layer_index is not None else None
-        
-        # Build Outlines Logits Processor
-        lp_list = None
-        if from_transformers and get_json_schema_logits_processor:
-            from domain_slm_guardrails.api.schemas import AnswerWithCitations, DrugInteractionReport, PrescriptionSummary
-            import json
-            
-            schema_map = {
-                "answer_with_citations": AnswerWithCitations,
-                "drug_interaction_report": DrugInteractionReport,
-                "prescription_summary": PrescriptionSummary
-            }
-            schema_class = schema_map.get(output_format, AnswerWithCitations)
-            
-            outlines_model = from_transformers(_hf_model, _hf_tokenizer)
-            lp = get_json_schema_logits_processor(None, outlines_model, json.dumps(schema_class.model_json_schema()))
-            lp_list = LogitsProcessorList([lp])
 
-        records = collector.collect_from_query(
-            query=query,
-            source_chunk=retrieved_context,
-            source_id="hybrid_retrieval",
-            layer_indices=layer_indices,
-            max_new_tokens=128,
-            logits_processor=lp_list
-        )
-        
-        if records:
-            hidden_states = [r["hidden_state"] for r in records if "hidden_state" in r]
-            if hidden_states:
-                seq_tensor = torch.tensor(hidden_states, dtype=torch.float32).unsqueeze(0)
+    # Try LLM-based generation first (Ollama or HF)
+    llm_client = get_llm_client()
+    if llm_client and llm_client.is_available():
+        try:
+            # Select appropriate prompt template based on output_format
+            if output_format == "drug_interaction_report":
+                prompt = MedicalPrescriptionTemplates.format_drug_interaction_prompt(
+                    entity=query, context=retrieved_context
+                )
+            elif output_format == "prescription_summary":
+                prompt = MedicalPrescriptionTemplates.format_prescription_summary_prompt(
+                    entity=query, context=retrieved_context
+                )
             else:
-                seq_tensor = None
-                
-            answer_body = "".join(r["token"] for r in records).strip()
-            if not answer_body:
+                prompt = MedicalPrescriptionTemplates.format_rag_prompt(
+                    query=query, context=retrieved_context
+                )
+
+            # Generate answer using LLM
+            answer_body = llm_client.generate_with_context(
+                query=query,
+                context=retrieved_context,
+                max_tokens=512,
+                temperature=0.7
+            )
+
+            if not answer_body or len(answer_body.strip()) < 10:
+                # Fallback if LLM generation fails
                 answer_body = "I could not verify this confidently from the available source documents."
                 seq_tensor = None
+            else:
+                seq_tensor = None  # LLM generation doesn't produce hidden states for critic
+        except Exception as e:
+            print(f"LLM generation error: {e}, falling back to extractive approach")
+            llm_client = None
+            seq_tensor = None
+            answer_body = None
+    else:
+        llm_client = None
+        seq_tensor = None
+        answer_body = None
+
+    # Fallback to extractive approach if LLM is not available
+    if answer_body is None:
+        collector = get_collector()
+        if collector:
+            layer_index = enforcer.critic_metadata.get("layer_index")
+            layer_indices = [layer_index] if layer_index is not None else None
+
+            # Build Outlines Logits Processor
+            lp_list = None
+            if from_transformers and get_json_schema_logits_processor:
+                from domain_slm_guardrails.api.schemas import AnswerWithCitations, DrugInteractionReport, PrescriptionSummary
+                import json
+
+                schema_map = {
+                    "answer_with_citations": AnswerWithCitations,
+                    "drug_interaction_report": DrugInteractionReport,
+                    "prescription_summary": PrescriptionSummary
+                }
+                schema_class = schema_map.get(output_format, AnswerWithCitations)
+
+                outlines_model = from_transformers(_hf_model, _hf_tokenizer)
+                lp = get_json_schema_logits_processor(None, outlines_model, json.dumps(schema_class.model_json_schema()))
+                lp_list = LogitsProcessorList([lp])
+
+            records = collector.collect_from_query(
+                query=query,
+                source_chunk=retrieved_context,
+                source_id="hybrid_retrieval",
+                layer_indices=layer_indices,
+                max_new_tokens=128,
+                logits_processor=lp_list
+            )
+
+            if records:
+                hidden_states = [r["hidden_state"] for r in records if "hidden_state" in r]
+                if hidden_states:
+                    seq_tensor = torch.tensor(hidden_states, dtype=torch.float32).unsqueeze(0)
+                else:
+                    seq_tensor = None
+
+                answer_body = "".join(r["token"] for r in records).strip()
+                if not answer_body:
+                    answer_body = "I could not verify this confidently from the available source documents."
+                    seq_tensor = None
+            else:
+                seq_tensor = None
+                answer_body = "I could not verify this confidently from the available source documents."
         else:
             seq_tensor = None
             answer_body = "I could not verify this confidently from the available source documents."

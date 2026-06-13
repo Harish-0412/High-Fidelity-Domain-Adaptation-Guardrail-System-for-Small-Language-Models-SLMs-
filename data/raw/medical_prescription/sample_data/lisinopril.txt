@@ -1,0 +1,28 @@
+
+LISINOPRIL
+
+INDICATIONS AND USAGE:
+Lisinopril is indicated for:
+- Treatment of hypertension
+- Management of heart failure
+- Acute myocardial infarction (within 24 hours)
+
+DOSAGE AND ADMINISTRATION:
+Hypertension: Initial 10 mg once daily, maintenance 20-40 mg once daily
+Heart failure: Initial 5 mg once daily, maintenance 5-40 mg once daily
+Post-MI: Initial 5 mg within 24 hours, then 5 mg at 24 hours, 10 mg at 48 hours, then 10 mg daily
+
+CONTRAINDICATIONS:
+- History of angioedema related to ACE inhibitor therapy
+- Hereditary or idiopathic angioedema
+- Pregnancy (second and third trimesters)
+
+ADVERSE REACTIONS:
+Common: Dry cough, headache, dizziness, hypotension
+Serious: Angioedema, hyperkalemia, renal impairment
+
+DRUG INTERACTIONS:
+- Potassium supplements (hyperkalemia risk)
+- Diuretics (increased hypotension risk)
+- Lithium (increased lithium levels)
+- NSAIDs (reduced antihypertensive effect)

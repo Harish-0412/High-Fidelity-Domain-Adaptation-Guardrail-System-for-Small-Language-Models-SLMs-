@@ -1,0 +1,25 @@
+
+METFORMIN hydrochloride
+
+INDICATIONS AND USAGE:
+Metformin is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus.
+
+DOSAGE AND ADMINISTRATION:
+Starting dose: 500 mg twice daily or 850 mg once daily
+Maintenance dose: 2000 mg daily (max 2550 mg)
+Take with meals to reduce gastrointestinal side effects
+
+CONTRAINDICATIONS:
+- Renal impairment (eGFR < 30 mL/min/1.73 m²)
+- Acute or chronic metabolic acidosis
+- Hypersensitivity to metformin
+
+ADVERSE REACTIONS:
+Common: Diarrhea, nausea, vomiting, abdominal discomfort, metallic taste
+Serious: Lactic acidosis (rare but serious), vitamin B12 deficiency
+
+DRUG INTERACTIONS:
+- Cimetidine (increased metformin levels)
+- Furosemide (increased metformin levels)
+- Nifedipine (increased metformin absorption)
+- Alcohol (increased lactic acidosis risk)

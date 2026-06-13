@@ -41,12 +41,27 @@ def _source_id(path: Path) -> str:
 
 
 def _load_text(path: Path) -> list[DocumentPage]:
+    # Try multiple encodings to handle different file formats
+    encodings = ["utf-8", "latin-1", "cp1252", "iso-8859-1"]
+    text = None
+
+    for encoding in encodings:
+        try:
+            text = path.read_text(encoding=encoding)
+            break
+        except UnicodeDecodeError:
+            continue
+
+    if text is None:
+        # If all encodings fail, try with error handling
+        text = path.read_text(encoding="utf-8", errors="ignore")
+
     return [
         DocumentPage(
             source_id=_source_id(path),
             source_path=str(path),
             page=1,
-            text=path.read_text(encoding="utf-8"),
+            text=text,
         )
     ]
 

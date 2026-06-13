@@ -9,4 +9,14 @@ dense_vector_size: 384
 critic_hallucination_threshold: 0.5
 critic_checkpoint_path: outputs/critic/critic_model.pt
 
+# LLM Configuration for Generation
+llm:
+  type: ollama  # Options: "ollama" or "hf"
+  model: llama3.2  # For Ollama: llama3.2, mistral, phi3, etc. For HF: model name
+  base_url: http://localhost:11434  # Ollama server URL
+  temperature: 0.7
+  max_tokens: 512
+  # HF-specific settings (only used if type: "hf")
+  device: auto  # auto, cuda, cpu
+
 

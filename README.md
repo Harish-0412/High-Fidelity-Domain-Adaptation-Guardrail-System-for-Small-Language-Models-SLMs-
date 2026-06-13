@@ -1,7 +1,6 @@
 # Generic Domain SLM Guardrails
 
-<<<<<<< HEAD
-A production-oriented framework for building domain-specialized, citation-bearing, guardrailed Small Language Model (SLM) systems. The project is designed as a reusable core platform with `medical_prescription` as the first domain adapter.
+A production-oriented framework for building domain-specialized, citation-bearing, guardrailed Advanced RAG systems. The project is designed as a reusable core platform with `medical_prescription` as the first domain adapter.
 
 The current implementation focuses on the Retrieval-Augmented Generation (RAG) foundation: document ingestion, chunking, hybrid retrieval, citation-bearing answers, fallback behavior, API serving, and an initial evaluation set. Future phases extend this into QLoRA fine-tuning, DPO alignment, hidden-state hallucination detection, and live guardrail enforcement.
 
@@ -20,7 +19,7 @@ This project builds a system that:
 - Tracks answer quality through an evaluation set.
 - Prepares the architecture for future fine-tuning and hallucination critic phases.
 
-The first adapter is `medical_prescription`, using public medical prescription and ICD-10-CM style source documents.
+The first adapter is `medical_prescription`, using public medical prescription and drug labeling source documents.
 
 ## Why This Project Is Needed
 
@@ -408,200 +407,11 @@ python scripts/run_rag_eval.py
 ```
 
 Expected current result:
-=======
-A production-oriented framework for building domain-specialized, citation-bearing, guardrailed Small Language Model (SLM) systems. The project is designed as a reusable core platform with `medical_billing` as the first domain adapter.
-
-The current implementation focuses on the Retrieval-Augmented Generation (RAG) foundation: document ingestion, chunking, hybrid retrieval, citation-bearing answers, fallback behavior, API serving, and an initial evaluation set. Future phases extend this into QLoRA fine-tuning, DPO alignment, hidden-state hallucination detection, and live guardrail enforcement.
-
-## Project Description
-
-Enterprises often want smaller, cheaper models that can answer narrow-domain questions accurately. The problem is that generic language models can hallucinate, especially in high-stakes domains such as medical billing, legal compliance, finance, insurance, and internal policy.
-
-This project builds a system that:
-
-- Ingests domain documents such as PDFs, text files, and manuals.
-- Converts documents into clean searchable chunks.
-- Retrieves evidence using hybrid sparse plus dense search.
-- Produces answers with explicit citations.
-- Falls back safely when evidence is weak.
-- Exposes a FastAPI interface for production integration.
-- Tracks answer quality through an evaluation set.
-- Prepares the architecture for future fine-tuning and hallucination critic phases.
-
-The first adapter is `medical_billing`, using public medical billing and ICD-10-CM style source documents.
-
-## Why This Project Is Needed
-
-Most enterprise AI systems fail at one of three points:
-
-1. They are too expensive because they depend only on large frontier models.
-2. They are too generic because the model is not adapted to a narrow domain.
-3. They are too risky because answers are not grounded in verifiable sources.
-
-This project addresses those issues by combining:
-
-- A smaller model strategy.
-- Domain-specific retrieval.
-- Citation-bearing responses.
-- Evaluation-driven development.
-- Future active hallucination guardrails.
-
-The goal is not just to generate fluent answers. The goal is to make answers traceable, auditable, and safe enough for enterprise workflows.
-
-## Current Status
-
-Implemented:
-
-- Generic domain registry.
-- `medical_billing` domain adapter.
-- PDF, TXT, and Markdown ingestion.
-- Text cleaning and chunking.
-- BM25+ sparse retrieval with stemming.
-- Local dense retrieval with hashing embeddings.
-- Hybrid retrieval using Reciprocal Rank Fusion.
-- Citation-bearing RAG response service.
-- FastAPI `/health` and `/query` endpoints.
-- Initial RAG evaluation dataset.
-- Unit tests for registry, chunking, retrieval, RAG API, and evaluation.
-
-Planned:
-
-- Production embedding model integration.
-- Qdrant-first vector search.
-- Query rewriting and reranking.
-- QLoRA fine-tuning.
-- DPO alignment.
-- Hidden-state hallucination critic.
-- Live generation guardrail hook.
-- Triton or high-throughput serving.
-
-## Advanced DPO Architecture
-
-- `DPOPreferenceGenerator`: generates high-quality preference pairs by pairing grounded, cited answers with deliberately weaker alternatives.
-- `DPOTrainer`: performs adapter-based policy alignment using a reference SFT model and configurable DPO hyperparameters.
-- `GroundednessComparator`: measures the real-world impact of alignment using objective grounding metrics and automated reporting.
-
-This pipeline emphasizes DPO as a distinct alignment phase that teaches the model to prefer fact-supported, citation-backed outputs over vague or hallucinated answers while preserving domain knowledge from SFT.
-## Tech Stack
-
-### Implemented
-
-| Layer | Technology | Purpose |
-|---|---|---|
-| Language | Python | Core implementation |
-| API | FastAPI | Query endpoint and health check |
-| Data format | JSONL | Chunks, local dense index, eval data |
-| PDF parsing | PyMuPDF | Extract text from PDF documents |
-| Sparse retrieval | Custom BM25+ | Fast keyword/code-based retrieval |
-| Dense retrieval | Local hashing embeddings | Dependency-light semantic fallback |
-| Hybrid retrieval | Reciprocal Rank Fusion | Merge sparse and dense evidence |
-| Evaluation | Pytest + custom eval runner | Regression tests and RAG quality checks |
-| Vector DB path | Qdrant wrapper | Production vector store integration |
-| Container support | Docker Compose | Qdrant service setup |
-
-### Planned For Later Phases
-
-| Layer | Technology | Purpose |
-|---|---|---|
-| Base SLM | Llama-3-8B or Phi-3.5-mini | Domain-adapted generation |
-| Training | PyTorch, Transformers | Model loading and training |
-| Efficient tuning | PEFT, QLoRA, Unsloth | Low-cost domain fine-tuning |
-| Preference alignment | TRL DPOTrainer | Align model toward grounded answers |
-| Guardrail critic | PyTorch BiLSTM or 1D-CNN | Detect hallucination from hidden states |
-| Constrained decoding | Outlines | JSON/schema-valid outputs |
-| Production serving | Triton Inference Server | Dynamic batching and high throughput |
-
-## Inputs
-
-### Raw Domain Documents
-
-The ingestion layer currently supports:
-
-```text
-.pdf
-.txt
-.md
-```
-
-Example folder:
-
-```text
-data/raw/medical_billing/
-```
-
-Example documents:
-
-```text
-medical billing manuals
-ICD-10-CM guidelines
-claims processing references
-coding policy documents
-internal billing SOPs
-```
-
-### API Query Input
-
-```json
-{
-  "domain": "medical_billing",
-  "query": "When should modifier 25 be used?",
-  "top_k": 3,
-  "output_format": "answer_with_citations"
-}
-```
-
-## Outputs
-
-### API Response
-
-```json
-{
-  "domain": "medical_billing",
-  "query": "When should modifier 25 be used?",
-  "answer": "Modifier 25 is used to indicate that a significant, separately identifiable evaluation and management service was performed... [C1]",
-  "citations": [
-    {
-      "citation_id": "C1",
-      "chunk_id": "medical_billing_sample_modifier_25_p0001_c001",
-      "source_id": "sample_modifier_25",
-      "page": 1,
-      "score": 0.0328,
-      "text": "Modifier 25 is used to indicate..."
-    }
-  ],
-  "guardrail_status": {
-    "rag_grounded": true,
-    "json_valid": true,
-    "fallback_used": false,
-    "reason": null,
-    "critic_score": 0.5803
-  },
-  "latency_ms": 123.45
-}
-```
-
-### Fallback Response
-
-When evidence is missing or weak:
-
-```json
-{
-  "answer": "I could not verify this from the available source documents.",
-  "citations": [],
-  "guardrail_status": {
-    "rag_grounded": false,
-    "fallback_used": true,
-    "reason": "no_retrieval_evidence"
-  }
-}
-```
-
-## Target Audiences
 
 This project is useful for:
 
-- AI/ML engineers building domain-adapted SLM systems.
-- Healthcare technology teams working on medical billing assistants.
+- AI/ML engineers building domain-adapted RAG systems.
+- Healthcare technology teams working on medical prescription assistants.
 - Compliance and audit teams that need source-grounded answers.
 - Enterprise architects evaluating cheaper alternatives to large-model-only workflows.
 - Researchers studying hallucination detection and guardrailed inference.
@@ -803,7 +613,7 @@ http://127.0.0.1:8000/docs
 ```bash
 curl -X POST http://127.0.0.1:8000/query \
   -H "Content-Type: application/json" \
-  -d "{\"domain\":\"medical_billing\",\"query\":\"When should modifier 25 be used?\",\"top_k\":3}"
+  -d "{\"domain\":\"medical_prescription\",\"query\":\"What are the indications for aspirin?\",\"top_k\":3}"
 ```
 
 ### 6. Run Tests
@@ -826,7 +636,6 @@ passed: 4
 pass_rate: 1.0
 ```
 
->>>>>>> efbde812f3e743ec92e56ac0a45242758e0059ed
 ## Main Files Responsible For RAG Quality
 
 | File | Why It Matters |
@@ -837,11 +646,7 @@ pass_rate: 1.0
 | `domain_slm_guardrails/retrieval/embeddings.py` | Controls semantic vector generation |
 | `domain_slm_guardrails/retrieval/vector_store.py` | Stores and searches dense vectors |
 | `domain_slm_guardrails/ingestion/chunkers.py` | Determines how much evidence each chunk contains |
-<<<<<<< HEAD
 | `data/evaluation/medical_prescription/rag_eval.jsonl` | Defines the first measurable RAG success cases |
-=======
-| `data/evaluation/medical_billing/rag_eval.jsonl` | Defines the first measurable RAG success cases |
->>>>>>> efbde812f3e743ec92e56ac0a45242758e0059ed
 
 ## Implementation Roadmap
 
@@ -912,12 +717,8 @@ Status: planned.
 ## Future Enhancements
 
 - Add more domains using the same domain registry pattern.
-- Add licensed CPT material if available.
-<<<<<<< HEAD
+- Add licensed drug labeling material if available.
 - Expand medical prescription eval from 4 cases to 100-300 cases.
-=======
-- Expand medical billing eval from 4 cases to 100-300 cases.
->>>>>>> efbde812f3e743ec92e56ac0a45242758e0059ed
 - Add source-type filters and page-range filters.
 - Add explainability metrics for retrieved chunks.
 - Add streaming API responses.

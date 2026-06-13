@@ -41,6 +41,25 @@ class ThresholdUpdateRequest(BaseModel):
     threshold: float = Field(ge=0.0, le=1.0)
 
 
+class VoiceAgentWidgetConfig(BaseModel):
+    variant: str | None = None
+    placement: str | None = None
+    avatar: dict[str, object] | None = None
+    bg_color: str | None = None
+    text_color: str | None = None
+    btn_color: str | None = None
+    btn_text_color: str | None = None
+    border_color: str | None = None
+
+
+class VoiceAgentConfig(BaseModel):
+    agent_id: str
+    name: str
+    first_message: str | None = None
+    supports_text_only: bool = True
+    widget: VoiceAgentWidgetConfig = Field(default_factory=VoiceAgentWidgetConfig)
+
+
 # ---------------------------------------------------------------------------
 # Structured Output Schemas
 # ---------------------------------------------------------------------------

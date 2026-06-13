@@ -1,0 +1,30 @@
+
+ASPIRIN (acetylsalicylic acid)
+
+INDICATIONS AND USAGE:
+Aspirin is indicated for:
+- Relief of mild to moderate pain (headache, toothache, muscle aches)
+- Reduction of fever
+- Anti-inflammatory treatment in rheumatoid arthritis and osteoarthritis
+- Cardiovascular protection (low-dose aspirin for prevention of myocardial infarction and stroke)
+
+DOSAGE AND ADMINISTRATION:
+Adults: 325-650 mg every 4-6 hours as needed for pain/fever
+Cardiovascular protection: 81-325 mg daily
+Maximum dose: 4 g in 24 hours
+
+CONTRAINDICATIONS:
+- Hypersensitivity to aspirin or other NSAIDs
+- Active peptic ulcer disease
+- Bleeding disorders
+- Children and teenagers with viral infections (Reye's syndrome risk)
+
+ADVERSE REACTIONS:
+Common: Gastrointestinal upset, nausea, dyspepsia
+Serious: GI bleeding, ulceration, bronchospasm, anaphylaxis
+
+DRUG INTERACTIONS:
+- Anticoagulants (increased bleeding risk)
+- Other NSAIDs (increased GI toxicity)
+- Corticosteroids (increased ulcer risk)
+- ACE inhibitors (reduced antihypertensive effect)

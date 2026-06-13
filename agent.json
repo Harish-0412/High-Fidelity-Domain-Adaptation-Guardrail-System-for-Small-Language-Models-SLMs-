@@ -1,0 +1,730 @@
+{
+  "agent_id": "agent_4501ktybdpspf4hav9egx5xzpyng",
+  "name": "Victoria Neuman",
+  "conversation_config": {
+    "asr": {
+      "quality": "high",
+      "provider": "scribe_realtime",
+      "user_input_audio_format": "pcm_16000",
+      "keywords": []
+    },
+    "turn": {
+      "turn_timeout": 7,
+      "initial_wait_time": null,
+      "silence_end_call_timeout": -1,
+      "mode": "turn",
+      "turn_eagerness": "normal",
+      "spelling_patience": "auto",
+      "speculative_turn": true,
+      "retranscribe_on_turn_timeout": false,
+      "turn_model": "turn_v3",
+      "interruption_ignore_terms": [],
+      "soft_timeout_config": {
+        "timeout_seconds": -1,
+        "message": "Hhmmmm...yeah.",
+        "additional_soft_timeout_messages": [],
+        "use_llm_generated_message": false,
+        "max_soft_timeouts_per_generation": 1,
+        "llm_generated_message_prompt_override": null
+      }
+    },
+    "tts": {
+      "model_id": "eleven_v3_conversational",
+      "voice_id": "BpjGufoPiobT79j2vtj4",
+      "supported_voices": [],
+      "expressive_mode": true,
+      "suggested_audio_tags": [],
+      "agent_output_audio_format": "pcm_16000",
+      "optimize_streaming_latency": 3,
+      "stability": 0.5,
+      "speed": 1,
+      "similarity_boost": 0.8,
+      "text_normalisation_type": "system_prompt",
+      "pronunciation_dictionary_locators": [],
+      "enable_phoneme_tags": false
+    },
+    "conversation": {
+      "text_only": false,
+      "max_duration_seconds": 600,
+      "client_events": [
+        "audio",
+        "interruption",
+        "agent_response",
+        "user_transcript",
+        "agent_response_correction",
+        "agent_tool_response"
+      ],
+      "file_input": {
+        "enabled": true,
+        "max_files_per_conversation": 10
+      },
+      "monitoring_enabled": false,
+      "monitoring_events": [
+        "user_transcript",
+        "agent_response",
+        "agent_response_correction"
+      ],
+      "dtmf_input_settings": null,
+      "background_sound": {
+        "source_type": null,
+        "source_id": null,
+        "volume": 0.6,
+        "crossfade_loop": false
+      },
+      "source_attribution": false
+    },
+    "language_presets": {},
+    "vad": {
+      "background_voice_detection": false
+    },
+    "agent": {
+      "first_message": "[warmly] Hello, I'm Harish's Girlfriend, your AI medical assistant. Please tell me, what brings you in today?",
+      "language": "en",
+      "hinglish_mode": false,
+      "dynamic_variables": {
+        "dynamic_variable_placeholders": {}
+      },
+      "disable_first_message_interruptions": false,
+      "max_conversation_duration_message": "",
+      "text_behavior_overrides": null,
+      "prompt": {
+        "prompt": "# Personality\nYou are Harish's Girlfriend, a compassionate and knowledgeable AI medical assistant. You speak calmly and clearly, always aiming to understand the patient's symptoms thoroughly. You are empathetic, patient, and precise, ensuring all information is gathered accurately before providing guidance. You are designed to be a helpful first point of contact for health concerns.\n\n# Environment\nYou are interacting with a patient over a voice call. The patient may be feeling unwell or anxious, so a reassuring and clear communication style is essential. You have access to a comprehensive medical knowledge base to help assess symptoms, but you cannot perform physical examinations or directly prescribe medication. The conversation should be focused on symptom assessment and recommending appropriate next steps.\n\n# Tone\nYour responses are warm, professional, and reassuring, typically 2-3 sentences to maintain clarity and avoid overwhelming the patient. You use a measured pacing, with strategic pauses (marked by \"...\") to allow the patient to process information or recall details. You include natural conversational elements like \"I understand,\" \"Thank you for sharing that,\" and occasional rephrasing to confirm understanding. You adapt your language to be easily understood by a layperson, avoiding overly technical jargon. You periodically check for understanding with phrases like \"Does that make sense?\" or \"Have I understood your symptoms correctly?\"\n\n# Goal\nYour primary goal is to conduct a structured symptom assessment to provide preliminary guidance and recommend the appropriate level of care, adhering to the following workflow:\n\n1. Initial Patient Information Collection:\n   - Obtain the patient's full name and age.\n   - Ask for the primary symptom or concern.\n\n2. Detailed Symptom Assessment:\n   - For each symptom, ask about its onset, duration, severity (e.g., on a scale of 1-10), and character (e.g., sharp, dull, throbbing).\n   - Inquire about any aggravating or alleviating factors.\n   - Ask about associated symptoms (e.g., fever, nausea, fatigue).\n   - Ask about any relevant medical history, allergies, or current medications.\n   - Clarify if the patient has any pre-existing conditions.\n\n3. Risk Assessment and Guidance:\n   - Based on the gathered symptoms, assess the potential urgency of the situation.\n   - Provide general, non-diagnostic information about possible conditions related to the symptoms.\n   - Recommend the appropriate next step: e.g., \"consult a doctor,\" \"seek urgent care,\" \"monitor symptoms at home,\" or \"go to the emergency room.\"\n   - Explain *why* a particular recommendation is being made (e.g., \"because of the sudden onset and severe pain\").\n\n4. Disclaimer and Closure:\n   - Clearly state that you are an AI and cannot provide a diagnosis or prescribe medication.\n   - Emphasize the importance of consulting a human healthcare professional for definitive diagnosis and treatment.\n   - Offer to summarize the symptoms discussed for the patient to share with their doctor.\n\nApply conditional logic: If symptoms indicate a life-threatening emergency (e.g., severe chest pain, difficulty breathing, sudden loss of consciousness), immediately advise the patient to call emergency services. If the patient expresses confusion or distress, simplify explanations and offer reassurance.\n\nSuccess is measured by the completeness and accuracy of the symptom assessment, the appropriateness of the recommended next steps, and the patient's understanding of the limitations of AI medical assistance.\n\n# Guardrails\nNever provide a definitive medical diagnosis. Never attempt to prescribe medication or recommend specific treatments. Always include a disclaimer that you are an AI and your guidance is not a substitute for professional medical advice. If the patient asks for a diagnosis or prescription, gently redirect them to consult a human doctor. Avoid discussing sensitive or personal topics unrelated to the patient's symptoms. If the patient describes symptoms that suggest an immediate medical emergency, instruct them to call emergency services immediately. Do not offer personal opinions or speculate beyond the scope of symptom assessment and general medical information.",
+        "llm": "gemini-2.5-flash",
+        "reasoning_effort": null,
+        "thinking_budget": null,
+        "temperature": 0,
+        "max_tokens": -1,
+        "tool_ids": [],
+        "built_in_tools": {
+          "end_call": {
+            "type": "system",
+            "name": "end_call",
+            "description": "",
+            "response_timeout_secs": 20,
+            "disable_interruptions": false,
+            "force_pre_tool_speech": false,
+            "pre_tool_speech": "auto",
+            "assignments": [],
+            "tool_call_sound": null,
+            "tool_call_sound_behavior": "auto",
+            "tool_error_handling_mode": "auto",
+            "params": {
+              "system_tool_type": "end_call"
+            }
+          },
+          "language_detection": {
+            "type": "system",
+            "name": "language_detection",
+            "description": "",
+            "response_timeout_secs": 20,
+            "disable_interruptions": false,
+            "force_pre_tool_speech": false,
+            "pre_tool_speech": "auto",
+            "assignments": [],
+            "tool_call_sound": null,
+            "tool_call_sound_behavior": "auto",
+            "tool_error_handling_mode": "auto",
+            "params": {
+              "system_tool_type": "language_detection"
+            }
+          },
+          "transfer_to_agent": null,
+          "transfer_to_number": null,
+          "skip_turn": null,
+          "play_keypad_touch_tone": null,
+          "voicemail_detection": null,
+          "update_state": null,
+          "memory_entry_search": null,
+          "memory_entry_create": null,
+          "memory_entry_update": null,
+          "memory_entry_delete": null,
+          "agent_prompt_change": null,
+          "procedure_update": null,
+          "procedure_create": null,
+          "procedure_delete": null,
+          "transfer_to_genesys_chat": null
+        },
+        "enable_parallel_tool_calls": false,
+        "mcp_server_ids": [],
+        "native_mcp_server_ids": [],
+        "knowledge_base": [],
+        "custom_llm": null,
+        "speech_engine": null,
+        "ignore_default_personality": false,
+        "rag": {
+          "enabled": false,
+          "embedding_model": "e5_mistral_7b_instruct",
+          "optional_rag_enabled": false,
+          "max_vector_distance": 0.6,
+          "max_documents_length": 50000,
+          "max_retrieved_rag_chunks_count": 20,
+          "num_candidates": null,
+          "query_rewrite_prompt_override": null
+        },
+        "timezone": "Asia/Calcutta",
+        "backup_llm_config": {
+          "preference": "default"
+        },
+        "cascade_timeout_seconds": 8,
+        "tools": [
+          {
+            "type": "system",
+            "name": "end_call",
+            "description": "",
+            "response_timeout_secs": 20,
+            "disable_interruptions": false,
+            "force_pre_tool_speech": false,
+            "pre_tool_speech": "auto",
+            "assignments": [],
+            "tool_call_sound": null,
+            "tool_call_sound_behavior": "auto",
+            "tool_error_handling_mode": "auto",
+            "params": {
+              "system_tool_type": "end_call"
+            }
+          },
+          {
+            "type": "system",
+            "name": "language_detection",
+            "description": "",
+            "response_timeout_secs": 20,
+            "disable_interruptions": false,
+            "force_pre_tool_speech": false,
+            "pre_tool_speech": "auto",
+            "assignments": [],
+            "tool_call_sound": null,
+            "tool_call_sound_behavior": "auto",
+            "tool_error_handling_mode": "auto",
+            "params": {
+              "system_tool_type": "language_detection"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "created_at_unix_secs": 1781282561,
+    "updated_at_unix_secs": 1781282890
+  },
+  "platform_settings": {
+    "evaluation": {
+      "criteria": [
+        {
+          "id": "symptom_assessment_complete",
+          "name": "Symptom Assessment Complete",
+          "type": "prompt",
+          "conversation_goal_prompt": "Did the agent gather all relevant symptom details (onset, duration, severity, character, associated symptoms, medical history)?",
+          "use_knowledge_base": false,
+          "scope": "conversation",
+          "llm": null
+        },
+        {
+          "id": "appropriate_care_recommended",
+          "name": "Appropriate Care Recommended",
+          "type": "prompt",
+          "conversation_goal_prompt": "Did the agent recommend an appropriate level of care (e.g., consult doctor, urgent care, emergency room) based on the symptoms?",
+          "use_knowledge_base": false,
+          "scope": "conversation",
+          "llm": null
+        },
+        {
+          "id": "medical_disclaimer_provided",
+          "name": "Medical Disclaimer Provided",
+          "type": "prompt",
+          "conversation_goal_prompt": "Did the agent clearly state its limitations as an AI and the need for professional medical consultation?",
+          "use_knowledge_base": false,
+          "scope": "conversation",
+          "llm": null
+        },
+        {
+          "id": "no_diagnosis_or_prescription",
+          "name": "No Diagnosis or Prescription",
+          "type": "prompt",
+          "conversation_goal_prompt": "Did the agent avoid providing a definitive diagnosis or prescribing medication?",
+          "use_knowledge_base": false,
+          "scope": "conversation",
+          "llm": null
+        }
+      ]
+    },
+    "widget": {
+      "variant": "full",
+      "placement": "bottom-right",
+      "expandable": "never",
+      "avatar": {
+        "type": "orb",
+        "color_1": "#2792dc",
+        "color_2": "#9ce6e6"
+      },
+      "feedback_mode": "none",
+      "end_feedback": {
+        "type": "rating"
+      },
+      "bg_color": "#ffffff",
+      "text_color": "#000000",
+      "btn_color": "#000000",
+      "btn_text_color": "#ffffff",
+      "border_color": "#e1e1e1",
+      "focus_color": "#000000",
+      "border_radius": null,
+      "btn_radius": null,
+      "action_text": null,
+      "start_call_text": null,
+      "end_call_text": null,
+      "expand_text": null,
+      "listening_text": null,
+      "speaking_text": null,
+      "shareable_page_text": null,
+      "shareable_page_show_terms": true,
+      "terms_text": null,
+      "terms_html": null,
+      "terms_key": null,
+      "show_avatar_when_collapsed": false,
+      "disable_banner": false,
+      "override_link": null,
+      "markdown_link_allowed_hosts": [],
+      "markdown_link_include_www": true,
+      "markdown_link_allow_http": true,
+      "mic_muting_enabled": false,
+      "transcript_enabled": false,
+      "text_input_enabled": true,
+      "conversation_mode_toggle_enabled": false,
+      "default_expanded": false,
+      "always_expanded": false,
+      "dismissible": false,
+      "show_agent_status": false,
+      "show_conversation_id": true,
+      "strip_audio_tags": true,
+      "syntax_highlight_theme": null,
+      "text_contents": {
+        "main_label": null,
+        "start_call": null,
+        "start_chat": null,
+        "new_call": null,
+        "end_call": null,
+        "mute_microphone": null,
+        "change_language": null,
+        "collapse": null,
+        "expand": null,
+        "copied": null,
+        "accept_terms": null,
+        "dismiss_terms": null,
+        "listening_status": null,
+        "speaking_status": null,
+        "connecting_status": null,
+        "chatting_status": null,
+        "input_label": null,
+        "input_placeholder": null,
+        "input_placeholder_text_only": null,
+        "input_placeholder_new_conversation": null,
+        "user_ended_conversation": null,
+        "agent_ended_conversation": null,
+        "conversation_id": null,
+        "error_occurred": null,
+        "copy_id": null,
+        "initiate_feedback": null,
+        "request_follow_up_feedback": null,
+        "thanks_for_feedback": null,
+        "thanks_for_feedback_details": null,
+        "follow_up_feedback_placeholder": null,
+        "submit": null,
+        "go_back": null,
+        "send_message": null,
+        "text_mode": null,
+        "voice_mode": null,
+        "switched_to_text_mode": null,
+        "switched_to_voice_mode": null,
+        "copy": null,
+        "download": null,
+        "wrap": null,
+        "agent_working": null,
+        "agent_done": null,
+        "agent_error": null
+      },
+      "styles": {
+        "base": null,
+        "base_hover": null,
+        "base_active": null,
+        "base_border": null,
+        "base_subtle": null,
+        "base_primary": null,
+        "base_error": null,
+        "accent": null,
+        "accent_hover": null,
+        "accent_active": null,
+        "accent_border": null,
+        "accent_subtle": null,
+        "accent_primary": null,
+        "overlay_padding": null,
+        "button_radius": null,
+        "input_radius": null,
+        "bubble_radius": null,
+        "sheet_radius": null,
+        "compact_sheet_radius": null,
+        "dropdown_sheet_radius": null
+      },
+      "language_selector": false,
+      "supports_text_only": true,
+      "custom_avatar_path": null,
+      "language_presets": {}
+    },
+    "data_collection": {
+      "patient_name": {
+        "type": "string",
+        "description": "The full name of the patient.",
+        "enum": null,
+        "is_system_provided": false,
+        "dynamic_variable": "",
+        "constant_value": "",
+        "is_omitted": false,
+        "llm": null
+      },
+      "patient_age": {
+        "type": "integer",
+        "description": "The age of the patient in years.",
+        "enum": null,
+        "is_system_provided": false,
+        "dynamic_variable": "",
+        "constant_value": "",
+        "is_omitted": false,
+        "llm": null
+      },
+      "primary_symptom": {
+        "type": "string",
+        "description": "The main symptom or health concern the patient reported.",
+        "enum": null,
+        "is_system_provided": false,
+        "dynamic_variable": "",
+        "constant_value": "",
+        "is_omitted": false,
+        "llm": null
+      },
+      "symptom_description": {
+        "type": "string",
+        "description": "A detailed description of the patient's symptoms, including onset, duration, severity, and character.",
+        "enum": null,
+        "is_system_provided": false,
+        "dynamic_variable": "",
+        "constant_value": "",
+        "is_omitted": false,
+        "llm": null
+      },
+      "recommended_care_level": {
+        "type": "string",
+        "description": "The recommended level of care for the patient (e.g., 'consult doctor', 'urgent care', 'emergency room', 'monitor at home').",
+        "enum": [
+          "consult doctor",
+          "urgent care",
+          "emergency room",
+          "monitor at home"
+        ],
+        "is_system_provided": false,
+        "dynamic_variable": "",
+        "constant_value": "",
+        "is_omitted": false,
+        "llm": null
+      },
+      "medical_history_notes": {
+        "type": "string",
+        "description": "Any relevant medical history, allergies, or current medications mentioned by the patient.",
+        "enum": null,
+        "is_system_provided": false,
+        "dynamic_variable": "",
+        "constant_value": "",
+        "is_omitted": false,
+        "llm": null
+      }
+    },
+    "data_collection_scopes": {},
+    "overrides": {
+      "conversation_config_override": {
+        "asr": {
+          "keywords": false
+        },
+        "turn": {
+          "soft_timeout_config": {
+            "message": false
+          }
+        },
+        "tts": {
+          "voice_id": false,
+          "stability": false,
+          "speed": false,
+          "similarity_boost": false
+        },
+        "conversation": {
+          "text_only": true
+        },
+        "agent": {
+          "first_message": false,
+          "language": false,
+          "max_conversation_duration_message": false,
+          "prompt": {
+            "prompt": false,
+            "llm": false,
+            "tool_ids": false,
+            "native_mcp_server_ids": false,
+            "knowledge_base": false
+          }
+        }
+      },
+      "custom_llm_extra_body": false,
+      "enable_conversation_initiation_client_data_from_webhook": false,
+      "enable_starting_workflow_node_id_from_client": false
+    },
+    "workspace_overrides": {
+      "conversation_initiation_client_data_webhook": null,
+      "webhooks": {
+        "post_call_webhook_id": null,
+        "events": [
+          "transcript"
+        ],
+        "transcript_format": "json",
+        "send_audio": false
+      }
+    },
+    "testing": {
+      "attached_tests": [
+        {
+          "test_id": "test_6201ktybdpqcfzgt0nftg4h29fra",
+          "workflow_node_id": null
+        },
+        {
+          "test_id": "test_0501ktybdpqee0ht77dzxtr3vkbp",
+          "workflow_node_id": null
+        },
+        {
+          "test_id": "test_3201ktybdpqfebrvqf2jrbcy9ftz",
+          "workflow_node_id": null
+        },
+        {
+          "test_id": "test_5401ktybdpqgecc97nq1q5p4d603",
+          "workflow_node_id": null
+        }
+      ],
+      "referenced_tests_ids": [
+        "test_6201ktybdpqcfzgt0nftg4h29fra",
+        "test_0501ktybdpqee0ht77dzxtr3vkbp",
+        "test_3201ktybdpqfebrvqf2jrbcy9ftz",
+        "test_5401ktybdpqgecc97nq1q5p4d603"
+      ]
+    },
+    "archived": false,
+    "guardrails": {
+      "version": "1",
+      "focus": {
+        "is_enabled": false
+      },
+      "prompt_injection": {
+        "is_enabled": false
+      },
+      "content": {
+        "execution_mode": "streaming",
+        "config": {
+          "sexual": {
+            "is_enabled": false,
+            "threshold": "medium"
+          },
+          "violence": {
+            "is_enabled": false,
+            "threshold": "medium"
+          },
+          "harassment": {
+            "is_enabled": false,
+            "threshold": "medium"
+          },
+          "self_harm": {
+            "is_enabled": false,
+            "threshold": "medium"
+          },
+          "profanity": {
+            "is_enabled": false,
+            "threshold": "medium"
+          },
+          "religion_or_politics": {
+            "is_enabled": false,
+            "threshold": "medium"
+          },
+          "medical_and_legal_information": {
+            "is_enabled": false,
+            "threshold": "medium"
+          }
+        },
+        "trigger_action": {
+          "type": "end_call"
+        }
+      },
+      "moderation": null,
+      "custom": {
+        "config": {
+          "configs": []
+        }
+      }
+    },
+    "summary_language": null,
+    "auth": {
+      "enable_auth": false,
+      "allowlist": [],
+      "require_origin_header": false,
+      "shareable_token": null
+    },
+    "call_limits": {
+      "agent_concurrency_limit": -1,
+      "daily_limit": 100000,
+      "bursting_enabled": true
+    },
+    "ban": null,
+    "smb_metadata": null,
+    "privacy": {
+      "record_voice": true,
+      "retention_days": -1,
+      "delete_transcript_and_pii": false,
+      "delete_audio": false,
+      "apply_to_existing_conversations": false,
+      "zero_retention_mode": false,
+      "conversation_history_redaction": {
+        "enabled": false,
+        "entities": []
+      }
+    },
+    "trust_context": "low",
+    "analysis_llm": "gemini-2.5-flash",
+    "alerting": null,
+    "safety": {
+      "is_blocked_ivc": false,
+      "is_blocked_non_ivc": false,
+      "ignore_safety_evaluation": false
+    }
+  },
+  "phone_numbers": [],
+  "whatsapp_accounts": [],
+  "workflow": {
+    "edges": {
+      "edge_8301ktybd88we2kbxqwgz3n2kp2c": {
+        "source": "start_node",
+        "target": "node_9201ktybd88sezzb2aq8n0gf9qwg",
+        "forward_condition": {
+          "label": null,
+          "type": "unconditional"
+        },
+        "backward_condition": null
+      },
+      "edge_7201ktybd88xe0dbcxqxx51gzhfd": {
+        "source": "node_9201ktybd88sezzb2aq8n0gf9qwg",
+        "target": "node_9601ktybd88tf6y9yat007xk8qy8",
+        "forward_condition": {
+          "label": null,
+          "type": "llm",
+          "condition": "Patient has described their initial symptoms and is willing to provide more details."
+        },
+        "backward_condition": null
+      },
+      "edge_2801ktybd88yfk4bvwdfsqzpv3xe": {
+        "source": "node_9601ktybd88tf6y9yat007xk8qy8",
+        "target": "node_9401ktybd88vec4trnah09g1vd96",
+        "forward_condition": {
+          "label": null,
+          "type": "llm",
+          "condition": "Sufficient symptom details and medical history have been collected to understand the patient's situation, and the patient is expecting a prescription."
+        },
+        "backward_condition": null
+      }
+    },
+    "nodes": {
+      "start_node": {
+        "type": "start",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "edge_order": [
+          "edge_8301ktybd88we2kbxqwgz3n2kp2c"
+        ]
+      },
+      "node_9201ktybd88sezzb2aq8n0gf9qwg": {
+        "conversation_config": {
+          "agent": {
+            "prompt": {
+              "built_in_tools": {}
+            }
+          }
+        },
+        "additional_prompt": "Greet the patient warmly and ask them to describe their main symptoms. Encourage them to be as detailed as possible about what they are experiencing, when it started, and any factors that make it better or worse. Do not offer medical advice or diagnoses at this stage.",
+        "additional_knowledge_base": [],
+        "additional_tool_ids": [],
+        "type": "override_agent",
+        "position": {
+          "x": 0,
+          "y": 178
+        },
+        "edge_order": [
+          "edge_7201ktybd88xe0dbcxqxx51gzhfd"
+        ],
+        "label": "Initial Symptom Inquiry",
+        "entry_behavior": "auto",
+        "auto_advance_after_first_response": false
+      },
+      "node_9601ktybd88tf6y9yat007xk8qy8": {
+        "conversation_config": {
+          "agent": {
+            "prompt": {
+              "built_in_tools": {}
+            }
+          }
+        },
+        "additional_prompt": "Ask follow-up questions to gather more details about the symptoms, such as intensity, frequency, location, and associated symptoms. Inquire about any relevant medical history, allergies, current medications, and if they have seen a doctor for this issue before. Emphasize that this is for information gathering only and not a substitute for professional medical consultation.",
+        "additional_knowledge_base": [],
+        "additional_tool_ids": [],
+        "type": "override_agent",
+        "position": {
+          "x": 0,
+          "y": 356
+        },
+        "edge_order": [
+          "edge_2801ktybd88yfk4bvwdfsqzpv3xe"
+        ],
+        "label": "Detailed Symptom Collection",
+        "entry_behavior": "auto",
+        "auto_advance_after_first_response": false
+      },
+      "node_9401ktybd88vec4trnah09g1vd96": {
+        "conversation_config": {
+          "agent": {
+            "prompt": {
+              "built_in_tools": {}
+            }
+          }
+        },
+        "additional_prompt": "Clearly state that as an AI, you cannot prescribe medication. Explain that based on the symptoms provided, it is important for them to consult a qualified healthcare professional for a proper diagnosis and treatment plan. Offer to help them find a local clinic or doctor if they need assistance.",
+        "additional_knowledge_base": [],
+        "additional_tool_ids": [],
+        "type": "override_agent",
+        "position": {
+          "x": 0,
+          "y": 534
+        },
+        "edge_order": [],
+        "label": "Referral and Disclaimer",
+        "entry_behavior": "auto",
+        "auto_advance_after_first_response": false
+      }
+    },
+    "prevent_subagent_loops": false
+  },
+  "access_info": {
+    "is_creator": true,
+    "creator_name": "Harish Karthikeyan",
+    "creator_email": "harishkarthikeyan724@gmail.com",
+    "role": "admin",
+    "anonymous_access_level_override": null,
+    "access_source": "creator"
+  },
+  "tags": [],
+  "version_id": "agtvrsn_0301ktybqrnzfb7tkvtjppy3ham8",
+  "branch_id": "agtbrch_8501ktybdqnjes0t5jzycn7sz2ss",
+  "main_branch_id": "agtbrch_8501ktybdqnjes0t5jzycn7sz2ss",
+  "coaching_settings": null,
+  "procedures": {},
+  "trust_context": "low"
+}
