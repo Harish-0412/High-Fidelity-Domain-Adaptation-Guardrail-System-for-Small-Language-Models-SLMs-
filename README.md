@@ -1,12 +1,12 @@
 # Generic Domain SLM Guardrails
 
-A production-oriented framework for building domain-specialized, citation-bearing, guardrailed Advanced RAG systems. The project is designed as a reusable core platform with `medical_prescription` as the first domain adapter.
+A production-oriented framework for building domain-specialized, citation-bearing, guardrailed Small Language Model (SLM) systems. The project is designed as a reusable core platform with `medical_billing` as the first domain adapter.
 
 The current implementation focuses on the Retrieval-Augmented Generation (RAG) foundation: document ingestion, chunking, hybrid retrieval, citation-bearing answers, fallback behavior, API serving, and an initial evaluation set. Future phases extend this into QLoRA fine-tuning, DPO alignment, hidden-state hallucination detection, and live guardrail enforcement.
 
 ## Project Description
 
-Enterprises often want smaller, cheaper models that can answer narrow-domain questions accurately. The problem is that generic language models can hallucinate, especially in high-stakes domains such as medical prescription, legal compliance, finance, insurance, and internal policy.
+Enterprises often want smaller, cheaper models that can answer narrow-domain questions accurately. The problem is that generic language models can hallucinate, especially in high-stakes domains such as medical billing, legal compliance, finance, insurance, and internal policy.
 
 This project builds a system that:
 
@@ -19,7 +19,7 @@ This project builds a system that:
 - Tracks answer quality through an evaluation set.
 - Prepares the architecture for future fine-tuning and hallucination critic phases.
 
-The first adapter is `medical_prescription`, using public medical prescription and drug labeling source documents.
+The first adapter is `medical_billing`, using public medical billing and ICD-10-CM style source documents.
 
 ## Why This Project Is Needed
 
@@ -44,7 +44,7 @@ The goal is not just to generate fluent answers. The goal is to make answers tra
 Implemented:
 
 - Generic domain registry.
-- `medical_prescription` domain adapter.
+- `medical_billing` domain adapter.
 - PDF, TXT, and Markdown ingestion.
 - Text cleaning and chunking.
 - BM25+ sparse retrieval with stemming.
@@ -118,13 +118,13 @@ The ingestion layer currently supports:
 Example folder:
 
 ```text
-data/raw/medical_prescription/
+data/raw/medical_billing/
 ```
 
 Example documents:
 
 ```text
-medical prescription manuals
+medical billing manuals
 ICD-10-CM guidelines
 claims processing references
 coding policy documents
@@ -135,7 +135,7 @@ internal billing SOPs
 
 ```json
 {
-  "domain": "medical_prescription",
+  "domain": "medical_billing",
   "query": "When should modifier 25 be used?",
   "top_k": 3,
   "output_format": "answer_with_citations"
@@ -148,13 +148,13 @@ internal billing SOPs
 
 ```json
 {
-  "domain": "medical_prescription",
+  "domain": "medical_billing",
   "query": "When should modifier 25 be used?",
   "answer": "Modifier 25 is used to indicate that a significant, separately identifiable evaluation and management service was performed... [C1]",
   "citations": [
     {
       "citation_id": "C1",
-      "chunk_id": "medical_prescription_sample_modifier_25_p0001_c001",
+      "chunk_id": "medical_billing_sample_modifier_25_p0001_c001",
       "source_id": "sample_modifier_25",
       "page": 1,
       "score": 0.0328,
@@ -193,225 +193,7 @@ When evidence is missing or weak:
 This project is useful for:
 
 - AI/ML engineers building domain-adapted SLM systems.
-- Healthcare technology teams working on medical prescription assistants.
-- Compliance and audit teams that need source-grounded answers.
-- Enterprise architects evaluating cheaper alternatives to large-model-only workflows.
-- Researchers studying hallucination detection and guardrailed inference.
-- Students building a strong applied AI portfolio project.
-
-## Architecture Diagram
-
-```mermaid
-flowchart LR
-    user["User or Enterprise App"]
-    api["FastAPI RAG API"]
-    registry["Domain Registry"]
-    rag["RAG Answer Service"]
-    retriever["Hybrid Retriever"]
-    bm25["BM25+ Sparse Index"]
-    dense["Dense Vector Index"]
-    citations["Citation Builder"]
-    guardrail["Grounding and Fallback Guardrail"]
-    response["Citation-Bearing Response"]
-
-    user --> api
-    api --> registry
-    api --> rag
-    rag --> retriever
-    retriever --> bm25
-    retriever --> dense
-    bm25 --> citations
-    dense --> citations
-    citations --> guardrail
-    guardrail --> response
-    response --> user
-```
-
-## Data Flow Diagram
-
-```mermaid
-flowchart TD
-    raw["Raw Domain Files<br/>PDF, TXT, MD"]
-    loader["Document Loaders"]
-    cleaner["Text Cleaner"]
-    chunker["Token-Aware Chunker"]
-    chunks["chunks.jsonl"]
-    embedder["Embedding Model<br/>local-hashing now, BGE planned"]
-    dense_index["dense_vectors.jsonl<br/>or Qdrant"]
-    bm25_index["bm25.pkl"]
-    query["User Query"]
-    hybrid["Hybrid Retrieval<br/>RRF Fusion"]
-    answer["Extractive RAG Answer"]
-    cite["Citations"]
-    fallback["Safe Fallback<br/>when evidence is weak"]
-
-    raw --> loader --> cleaner --> chunker --> chunks
-    chunks --> embedder --> dense_index
-    chunks --> bm25_index
-    query --> hybrid
-    dense_index --> hybrid
-    bm25_index --> hybrid
-    hybrid --> answer
-    hybrid --> cite
-    answer --> fallback
-    cite --> fallback
-```
-
-## Planned Full System Flow
-
-```mermaid
-flowchart TD
-    corpus["Domain Corpus"]
-    rag_index["RAG Index"]
-    sft["QLoRA Fine-Tuning"]
-    dpo["DPO Alignment"]
-    slm["Domain-Adapted SLM"]
-    critic_data["Hidden-State Dataset"]
-    critic["Hallucination Critic"]
-    generate["Guarded Generation"]
-    constrained["Constrained Decoding"]
-    safe["Safe Enterprise Response"]
-
-    corpus --> rag_index
-    corpus --> sft
-    sft --> dpo
-    dpo --> slm
-    slm --> critic_data
-    critic_data --> critic
-    rag_index --> generate
-    slm --> generate
-    critic --> generate
-    generate --> constrained
-    constrained --> safe
-```
-
-## Repository Structure
-
-```text
-domain_slm_guardrails/
-  api/
-    main.py          # FastAPI app
-    rag.py           # Citation-bearing RAG answer logic
-    schemas.py       # API request/response models
-  core/
-    config.py        # Base config loader
-    domain_registry.py
-  ingestion/
-    loaders.py       # PDF/TXT/MD loaders
-    cleaners.py      # Text cleanup
-    chunkers.py      # Token-aware chunking
-    pipeline.py      # End-to-end ingestion
-  retrieval/
-    bm25.py          # BM25+ sparse retrieval
-    embeddings.py    # Hashing and sentence-transformer embeddings
-    vector_store.py  # Local dense index and Qdrant wrapper
-    hybrid.py        # RRF fusion and cached retriever
-  evaluation/
-    rag_eval.py      # Initial RAG evaluation runner
-    groundedness_comparator.py  # DPO vs baseline groundedness comparator
-  training/
-    __init__.py      # QLoRA and DPO workflow package
-    dpo_generator.py # Preference dataset generation for DPO
-    dpo_trainer.py   # Adapter-based DPO training orchestration
-  critic/
-    __init__.py      # Placeholder for hallucination critic
-```
-
-Other important folders:
-
-```text
-configs/
-domains/
-scripts/
-tests/
-data/raw/
-data/processed/
-data/indexes/
-data/evaluation/
-docker/
-docs/
-```
-
-## Quick Start
-
-### 1. Ingest Documents
-
-```bash
-python scripts/ingest_domain.py --domain medical_prescription
-```
-
-This creates:
-
-```text
-data/processed/medical_prescription/chunks.jsonl
-```
-
-### 2. Build Indexes
-
-Local mode:
-
-```bash
-python scripts/build_index.py --domain medical_prescription --no-qdrant
-```
-
-This creates:
-
-```text
-data/indexes/medical_prescription/bm25.pkl
-data/indexes/medical_prescription/dense_vectors.jsonl
-```
-
-Qdrant mode:
-
-```bash
-docker compose -f docker/docker-compose.yml up -d
-python scripts/build_index.py --domain medical_prescription
-```
-
-### 3. Query Retrieval
-
-```bash
-python scripts/query_retrieval.py --domain medical_prescription --query "When should modifier 25 be used?"
-```
-
-### 4. Run The API
-
-```bash
-uvicorn domain_slm_guardrails.api.main:app --reload --port 8000
-```
-
-Open:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-### 5. Query The API
-
-```bash
-curl -X POST http://127.0.0.1:8000/query \
-  -H "Content-Type: application/json" \
-  -d "{\"domain\":\"medical_prescription\",\"query\":\"When should modifier 25 be used?\",\"top_k\":3}"
-```
-
-### 6. Run Tests
-
-```bash
-python -m pytest
-```
-
-### 7. Run Initial RAG Evaluation
-
-```bash
-python scripts/run_rag_eval.py
-```
-
-Expected current result:
-
-This project is useful for:
-
-- AI/ML engineers building domain-adapted RAG systems.
-- Healthcare technology teams working on medical prescription assistants.
+- Healthcare technology teams working on medical billing assistants.
 - Compliance and audit teams that need source-grounded answers.
 - Enterprise architects evaluating cheaper alternatives to large-model-only workflows.
 - Researchers studying hallucination detection and guardrailed inference.
@@ -580,16 +362,44 @@ data/indexes/medical_billing/dense_vectors.jsonl
 ```
 
 Qdrant mode:
->>>>>>> efbde812f3e743ec92e56ac0a45242758e0059ed
 
-```text
-total: 4
-passed: 4
-pass_rate: 1.0
+This project is useful for:
+
+- AI/ML engineers building domain-adapted RAG systems.
+- Healthcare technology teams working on medical prescription assistants.
+- Compliance and audit teams that need source-grounded answers.
+- Enterprise architects evaluating cheaper alternatives to large-model-only workflows.
+- Researchers studying hallucination detection and guardrailed inference.
+- Students building a strong applied AI portfolio project.
+
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+    user["User or Enterprise App"]
+    api["FastAPI RAG API"]
+    registry["Domain Registry"]
+    rag["RAG Answer Service"]
+    retriever["Hybrid Retriever"]
+    bm25["BM25+ Sparse Index"]
+    dense["Dense Vector Index"]
+    citations["Citation Builder"]
+    guardrail["Grounding and Fallback Guardrail"]
+    response["Citation-Bearing Response"]
+
+    user --> api
+    api --> registry
+    api --> rag
+    rag --> retriever
+    retriever --> bm25
+    retriever --> dense
+    bm25 --> citations
+    dense --> citations
+    citations --> guardrail
+    guardrail --> response
+    response --> user
 ```
 
-<<<<<<< HEAD
-=======
 ### 3. Query Retrieval
 
 ```bash
@@ -613,7 +423,7 @@ http://127.0.0.1:8000/docs
 ```bash
 curl -X POST http://127.0.0.1:8000/query \
   -H "Content-Type: application/json" \
-  -d "{\"domain\":\"medical_prescription\",\"query\":\"What are the indications for aspirin?\",\"top_k\":3}"
+  -d "{\"domain\":\"medical_billing\",\"query\":\"When should modifier 25 be used?\",\"top_k\":3}"
 ```
 
 ### 6. Run Tests
@@ -646,7 +456,7 @@ pass_rate: 1.0
 | `domain_slm_guardrails/retrieval/embeddings.py` | Controls semantic vector generation |
 | `domain_slm_guardrails/retrieval/vector_store.py` | Stores and searches dense vectors |
 | `domain_slm_guardrails/ingestion/chunkers.py` | Determines how much evidence each chunk contains |
-| `data/evaluation/medical_prescription/rag_eval.jsonl` | Defines the first measurable RAG success cases |
+| `data/evaluation/medical_billing/rag_eval.jsonl` | Defines the first measurable RAG success cases |
 
 ## Implementation Roadmap
 
@@ -717,8 +527,8 @@ Status: planned.
 ## Future Enhancements
 
 - Add more domains using the same domain registry pattern.
-- Add licensed drug labeling material if available.
-- Expand medical prescription eval from 4 cases to 100-300 cases.
+- Add licensed CPT material if available.
+- Expand medical billing eval from 4 cases to 100-300 cases.
 - Add source-type filters and page-range filters.
 - Add explainability metrics for retrieved chunks.
 - Add streaming API responses.

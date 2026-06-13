@@ -1,7 +1,17 @@
-from __future__ import annotations
+from domain_slm_guardrails.llm.ollama_client import OllamaClient, LLMConfig
+from domain_slm_guardrails.llm.prompts import PromptTemplates
+from domain_slm_guardrails.llm.generator import (
+    RAGGenerator,
+    GenerationConfig,
+    GenerationResult,
+)
 
-from domain_slm_guardrails.llm.base import BaseLLMClient
-from domain_slm_guardrails.llm.ollama_client import OllamaClient
-from domain_slm_guardrails.llm.hf_client import HFClient
+__all__ = [
+    "OllamaClient",
+    "LLMConfig",
+    "PromptTemplates",
+    "RAGGenerator",
+    "GenerationConfig",
+    "GenerationResult",
+]
 
-__all__ = ["BaseLLMClient", "OllamaClient", "HFClient"]

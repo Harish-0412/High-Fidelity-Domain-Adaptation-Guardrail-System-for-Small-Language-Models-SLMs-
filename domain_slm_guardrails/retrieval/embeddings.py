@@ -121,7 +121,6 @@ def load_embedding_model(model_name: str, dimension: int = 384) -> EmbeddingMode
 
 
 # ---------------------------------------------------------------------------
-# Similarity helpers
 # ---------------------------------------------------------------------------
 
 def _l2_normalize(vector: list[float]) -> list[float]:

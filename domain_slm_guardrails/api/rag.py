@@ -3,114 +3,15 @@ from __future__ import annotations
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Sequence
+from typing import Sequence, List, Optional
 
 from domain_slm_guardrails.api.schemas import Citation, GuardrailStatus, QueryResponse
 from domain_slm_guardrails.core.domain_registry import get_domain_config
 from domain_slm_guardrails.retrieval.hybrid import HybridResult, load_hybrid_retriever
-from domain_slm_guardrails.critic.enforcer import LiveGuardrailEnforcer
-from domain_slm_guardrails.core.config import load_base_config, project_root
-from domain_slm_guardrails.llm.ollama_client import OllamaClient
-from domain_slm_guardrails.llm.hf_client import HFClient
-from domain_slm_guardrails.llm.prompt_templates import MedicalPrescriptionTemplates
-from pathlib import Path
-
-# Initialize global enforcer
-try:
-    base_cfg = load_base_config()
-    chk_path = base_cfg.get("critic_checkpoint_path")
-    if chk_path:
-        full_chk_path = Path(chk_path)
-        if not full_chk_path.is_absolute():
-            full_chk_path = project_root() / full_chk_path
-        enforcer = LiveGuardrailEnforcer(checkpoint_path=full_chk_path)
-    else:
-        enforcer = LiveGuardrailEnforcer()
-except Exception:
-    enforcer = LiveGuardrailEnforcer()
-    base_cfg = {}
-
-try:
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorList
-    from domain_slm_guardrails.critic.collector import HiddenStateCollector
-except ImportError:
-    torch = None
-
-try:
-    from outlines import from_transformers
-    from outlines.generator import get_json_schema_logits_processor
-except ImportError:
-    from_transformers = None
-    get_json_schema_logits_processor = None
-
-_hf_model = None
-_hf_tokenizer = None
-_collector = None
-
-# LLM client for generation
-_llm_client = None
-_llm_client_type = None  # "ollama" or "hf"
-
-
-def get_llm_client():
-    """Get or create the LLM client for generation."""
-    global _llm_client, _llm_client_type
-
-    if _llm_client is not None:
-        return _llm_client
-
-    try:
-        base_cfg = load_base_config()
-        llm_config = base_cfg.get("llm", {})
-        llm_type = llm_config.get("type", "ollama")  # Default to Ollama
-
-        if llm_type == "ollama":
-            model = llm_config.get("model", "llama3.2")
-            base_url = llm_config.get("base_url", "http://localhost:11434")
-            _llm_client = OllamaClient(model=model, base_url=base_url)
-            _llm_client_type = "ollama"
-            print(f"Initialized Ollama client with model: {model}")
-        elif llm_type == "hf":
-            model = llm_config.get("model", "Qwen/Qwen2.5-3B")
-            device = llm_config.get("device", "auto")
-            _llm_client = HFClient(model_name=model, device=device)
-            _llm_client_type = "hf"
-            print(f"Initialized HF client with model: {model}")
-        else:
-            print(f"Unknown LLM type: {llm_type}, defaulting to Ollama")
-            _llm_client = OllamaClient()
-            _llm_client_type = "ollama"
-
-        return _llm_client
-    except Exception as e:
-        print(f"Failed to initialize LLM client: {e}")
-        return None
-
-def get_collector():
-    global _hf_model, _hf_tokenizer, _collector
-    if torch is None:
-        return None
-    if _collector is None:
-        try:
-            model_name = base_cfg.get("base_model_path", "Qwen/Qwen2.5-3B")
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            _hf_tokenizer = AutoTokenizer.from_pretrained(model_name)
-            _hf_model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                device_map="auto" if torch.cuda.is_available() else None,
-                low_cpu_mem_usage=True
-            )
-            _hf_model.eval()
-            if not torch.cuda.is_available():
-                _hf_model.to(device)
-            _collector = HiddenStateCollector(model=_hf_model, tokenizer=_hf_tokenizer, device=device)
-        except Exception as e:
-            print(f"Warning: Failed to load HF model: {e}")
-            _collector = None
-    return _collector
-
+from domain_slm_guardrails.llm import RAGGenerator, LLMConfig
+from domain_slm_guardrails.guardrails.guardrails_manager import GuardrailsManager, GuardrailsResult
+from domain_slm_guardrails.guardrails.hallucination_detector import HallucinationDetector
+from domain_slm_guardrails.guardrails.content_moderator import ContentModerator
 
 
 # ---------------------------------------------------------------------------
@@ -136,10 +37,12 @@ ABBREVIATIONS = (
     "LLC.",
     "E.M.",
 )
+# Improved: also split on line breaks!
 SEGMENT_RE = re.compile(
     r"(?<=[.!?])\s+(?=[A-Z0-9\"])"
     r"|(?=\b\d+\.\s+[A-Z])"
     r"|(?=\b[A-Z]\.\s+[A-Z])"
+    r"|[\r\n]+"
 )
 
 WORD_RE = re.compile(r"[A-Za-z0-9_]+")
@@ -174,6 +77,7 @@ class RAGConfig:
     # Answer assembly
     use_mmr: bool = True                 # Maximal Marginal Relevance deduplication
     coherence_sort: bool = True          # re-sort selected sentences by source order
+    use_llm_generation: bool = True     # Use LLM for answer generation
 
 
 # ---------------------------------------------------------------------------
@@ -250,6 +154,7 @@ def _score_sentence(
     Score a sentence for query relevance.
 
     Scoring components:
+    * exact_match_boost — huge boost if any query terms are found exactly
     * term_overlap   — how many query terms appear in the sentence
     * phrase_hits    — how many query n-grams appear as substrings
     * term_density   — overlap normalised by sentence vocabulary size
@@ -267,9 +172,16 @@ def _score_sentence(
     phrase_hits = sum(1 for ng in query_ngrams if ng in sentence_lower)
     density = overlap / max(len(sentence_terms), 1)
     length_penalty = max(0.0, (len(sentence) - 400) / 2000)
+    
+    # Boost exact matches for medication names (case-insensitive)
+    exact_match_boost = 0.0
+    for term in query_terms:
+        if f" {term.lower()} " in f" {sentence_lower} " or sentence_lower.startswith(f"{term.lower()} ") or sentence_lower.endswith(f" {term.lower()}"):
+            exact_match_boost += 10.0  # BIG boost for exact term matches
 
     return (
-        important_overlap * 4.0
+        exact_match_boost
+        + important_overlap * 4.0
         + generic_overlap * 0.75
         + phrase_hits * 3.5
         + density     * 1.5
@@ -353,7 +265,7 @@ def _best_sentences(
     """
     Extract the best answer sentences from retrieved chunks.
 
-    1. Score every sentence across all chunks.
+    1. Score every sentence across all chunks (prioritize top retrieved chunks!).
     2. Optionally apply MMR to diversify the selection.
     3. Optionally re-sort by source order for coherent reading flow.
     """
@@ -363,14 +275,17 @@ def _best_sentences(
     candidates: list[_SentenceCandidate] = []
     order = 0
 
-    for result in results:
+    for idx, result in enumerate(results):
         chunk_text = str(result.chunk.get("text", ""))
+        # Boost sentences from top retrieved chunks! (WAY stronger boost!)
+        chunk_boost = (len(results) - idx) / len(results) * 50.0
+        
         for sentence in _split_segments(chunk_text):
             sentence = _strip_page_header_prefix(sentence.strip(), page_header_prefix_pattern)
             if len(sentence) < _MIN_SENTENCE_LEN or _is_boilerplate_segment(sentence, page_header_pattern):
                 order += 1
                 continue
-            rel = _score_sentence(sentence, q_terms, q_ngrams, result.score, domain_generic_terms)
+            rel = _score_sentence(sentence, q_terms, q_ngrams, result.score) + chunk_boost
             if rel > 0:
                 candidates.append(
                     _SentenceCandidate(
@@ -477,13 +392,37 @@ def _estimate_confidence(results: list[HybridResult], sentences: list[str]) -> f
 # Public API
 # ---------------------------------------------------------------------------
 
+def _expand_query(query: str) -> str:
+    """Simple query expansion/typo correction for common medication names."""
+    query_lower = query.lower()
+    expanded_terms = []
+    
+    # Common medication typos
+    typo_map = {
+        "asprin": "aspirin",
+        "tylenol": "paracetamol acetaminophen",
+        "ibuprophen": "ibuprofen",
+        "ibuprofren": "ibuprofen",
+        "paracip": "paracetamol",
+        "amox": "amoxicillin",
+        "azithro": "azithromycin",
+    }
+    
+    for typo, correct in typo_map.items():
+        if typo in query_lower:
+            expanded_terms.append(correct)
+    
+    return " ".join(expanded_terms) if expanded_terms else None
+
+
 def answer_query(
     domain: str,
     query: str,
     top_k: int = 5,
     config: RAGConfig | None = None,
     expanded_query: str | None = None,
-    output_format: str = "answer_with_citations",
+    llm_config: LLMConfig | None = None,
+    use_guardrails: bool = True,
 ) -> QueryResponse:
     """
     Retrieve evidence and assemble a grounded answer.
@@ -494,11 +433,21 @@ def answer_query(
         top_k:          Number of chunks to retrieve.
         config:         RAGConfig overrides.
         expanded_query: Optional query expansion string passed to BM25.
+        llm_config:     LLM configuration for generation.
+        use_guardrails: Whether to apply content and hallucination guardrails.
     """
     started = time.perf_counter()
     config = config or RAGConfig()
     domain_cfg = get_domain_config(domain)
     retriever = load_hybrid_retriever(domain)
+    
+    # Initialize guardrails
+    guardrails_manager = GuardrailsManager() if use_guardrails else None
+    guardrails_result: Optional[GuardrailsResult] = None
+
+    # Auto-generate expanded query if not provided
+    if expanded_query is None:
+        expanded_query = _expand_query(query)
 
     raw_results = retriever.search(query, top_k=top_k, expanded_query=expanded_query)
     results = [
@@ -635,60 +584,48 @@ def answer_query(
             coherence_sort=config.coherence_sort,
         )
 
-        confidence = _estimate_confidence(results, sentences)
-
-        # Low-confidence fallback
-        if confidence < config.low_confidence_score or not sentences:
-            latency_ms = (time.perf_counter() - started) * 1000
-            return QueryResponse(
-                domain=domain,
-                query=query,
-                answer="I could not verify this confidently from the available source documents.",
-                citations=citations,
-                guardrail_status=GuardrailStatus(
-                    rag_grounded=True,
-                    fallback_used=True,
-                    reason="low_confidence",
-                    critic_score=round(1.0 - confidence, 4),
-                ),
-                latency_ms=round(latency_ms, 2),
+    # Generate answer with LLM or use extractive method
+    if config.use_llm_generation:
+        try:
+            generator = RAGGenerator(llm_config=llm_config)
+            generation_result = generator.generate_answer(query, citations)
+            answer = generation_result.answer
+            # If generation used fallback and we have extractive sentences, use extractive instead
+            if generation_result.was_fallback and sentences:
+                answer_body = " ".join(sentences)
+                top_citation_refs = " ".join(
+                    f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
+                )
+                answer = f"{answer_body} {top_citation_refs}"
+        except Exception as e:
+            # Fallback to extractive if LLM fails
+            answer_body = " ".join(sentences)
+            top_citation_refs = " ".join(
+                f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
             )
-
-        answer_body = " ".join(sentences)
-        seq_tensor = None
-
-    # Assemble answer with citations
-    top_citation_refs = " ".join(
-        f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
-    )
-    original_answer = f"{answer_body} {top_citation_refs}".strip()
-
-    # Score and enforce
-    guard_res = enforcer.score_and_enforce(
-        query=query,
-        retrieved_context=retrieved_context,
-        generated_answer=answer_body,
-        domain=domain,
-        seq_tensor=seq_tensor,
-    )
-
-    if guard_res["fallback_used"]:
-        fallback_msg = "I could not verify this confidently from the available source documents."
-        if output_format == "drug_interaction_report":
-            import json
-            answer = json.dumps({"interactions": [], "summary_warning": fallback_msg})
-        elif output_format == "prescription_summary":
-            import json
-            answer = json.dumps({"patient_instructions": fallback_msg, "dosage_schedule": "Unknown", "side_effects": [], "requires_followup": False})
-        else:
-            import json
-            answer = json.dumps({"answer": fallback_msg, "citations": []})
-        fallback_used = True
-        reason = guard_res["reason"] or "critic_threshold_crossed"
+            answer = f"{answer_body} {top_citation_refs}"
     else:
-        answer = original_answer
-        fallback_used = False
-        reason = None
+        # Assemble answer: coherently ordered sentences + up to 3 inline citation refs
+        answer_body = " ".join(sentences)
+        top_citation_refs = " ".join(
+            f"[{c.citation_id}]" for c in citations[: min(3, len(citations))]
+        )
+        answer = f"{answer_body} {top_citation_refs}"
+
+    # Apply guardrails
+    if guardrails_manager:
+        chunk_list = [r.chunk for r in results]
+        guardrails_result = guardrails_manager.apply_guardrails(
+            query=query,
+            generated_response=answer,
+            retrieved_chunks=chunk_list,
+        )
+        if not guardrails_result.overall_pass:
+            # If guardrails failed, modify answer to include warnings
+            warning_text = " ".join(guardrails_result.warnings)
+            answer = f"{answer}\n\nNote: {warning_text}"
+        # Update confidence using guardrails score
+        confidence = (confidence + guardrails_result.confidence_score) / 2
 
     latency_ms = (time.perf_counter() - started) * 1000
     return QueryResponse(

@@ -4,4 +4,11 @@ __pycache__/
 .venv/
 venv/
 env/
+*.egg-info/
+*.pkl
+*.pyc
+.DS_Store
+.vscode/
+.idea/
+test_*.py
 

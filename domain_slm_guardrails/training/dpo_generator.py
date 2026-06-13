@@ -134,13 +134,13 @@ class DPOPreferenceGenerator:
         evidence_text: str,
         strategy: DPORejectionStrategy,
     ) -> str:
-        if strategy in ("weakly_cited", "poorly cited"):
+        if strategy == "weakly_cited":
             return self._make_weakly_cited(chosen_answer)
         if strategy == "hallucinated":
             return self._make_hallucinated(chosen_answer)
         if strategy == "incomplete":
             return self._make_incomplete(chosen_answer)
-        if strategy in ("overly_verbose", "verbose"):
+        if strategy == "overly_verbose":
             return self._make_overly_verbose(chosen_answer)
         return chosen_answer
 
@@ -157,11 +157,6 @@ class DPOPreferenceGenerator:
 
     def _make_incomplete(self, text: str) -> str:
         sentences = [sentence.strip() for sentence in text.split(".") if sentence.strip()]
-        if len(sentences) <= 1:
-            words = text.split()
-            if len(words) > 3:
-                return " ".join(words[:max(1, len(words) // 2)]) + "..."
-            return text[:max(1, len(text) // 2)].strip() + "..."
         return ". ".join(sentences[: max(1, len(sentences) // 2)]) + "."
 
     def _make_overly_verbose(self, text: str) -> str:

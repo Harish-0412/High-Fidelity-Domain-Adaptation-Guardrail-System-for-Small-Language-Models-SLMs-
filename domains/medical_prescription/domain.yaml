@@ -1,28 +1,20 @@
 domain_id: medical_prescription
-name: Medical Prescription
+name: Medical Prescriptions and Medications
 corpus_path: data/raw/medical_prescription
 processed_path: data/processed/medical_prescription
 index_path: data/indexes/medical_prescription
 index_name: medical_prescription_chunks
-risk_level: high
-critic_hallucination_threshold: 0.4
-requires_citations: true
-allow_direct_prescribing: false
-source_authority: FDA openFDA drug labeling
-source_refresh_script: scripts/download_medical_prescription_sources.py
-page_header_pattern: null
-page_header_prefix_pattern: null
-domain_generic_terms:
-  - "drug"
-  - "drugs"
-  - "label"
-  - "labeling"
-  - "prescription"
-  - "medication"
-  - "medications"
-  - "treatment"
-prompt_templates:
-  - "What are the indications and usage for {entity}?"
-  - "What is the recommended dosage and administration for {entity}?"
-  - "List the contraindications and adverse reactions for {entity}."
-  - "Summarize the prescribing information for {entity}."
+settings:
+  embedding_model: local-hashing
+  dense_vector_size: 384
+  chunk_size: 512
+  chunk_overlap: 64
+  candidate_multiplier: 5
+  use_rrf: true
+  rrf_k: 60
+  dense_weight: 0.6
+  use_query_preprocessor: true
+  use_cross_encoder_reranker: false
+  cross_encoder_model: cross-encoder/ms-marco-MiniLM-L-12-v2
+  use_mmr: false
+  mmr_lambda: 0.6
