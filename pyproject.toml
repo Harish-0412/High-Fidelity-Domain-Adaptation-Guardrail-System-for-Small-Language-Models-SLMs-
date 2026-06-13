@@ -38,9 +38,6 @@ all = [
   "pytest>=8.0.0",
 ]
 
-[tool.setuptools]
-packages = ["domain_slm_guardrails"]
-
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]

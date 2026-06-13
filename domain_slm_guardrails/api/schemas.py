@@ -1,6 +1,60 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from typing import Any
+
+try:
+    from pydantic import BaseModel, Field
+except ModuleNotFoundError:
+    _MISSING = object()
+
+    class _DefaultFactory:
+        def __init__(self, factory: Any):
+            self.factory = factory
+
+        def build(self) -> Any:
+            return self.factory()
+
+    def Field(default: Any = _MISSING, **kwargs: Any) -> Any:
+        default_factory = kwargs.get("default_factory")
+        if default is _MISSING and default_factory is not None:
+            return _DefaultFactory(default_factory)
+        return default
+
+    class BaseModel:
+        """Minimal schema fallback for non-API test environments."""
+
+        def __init__(self, **data: Any):
+            annotations: dict[str, Any] = {}
+            for cls in reversed(self.__class__.mro()):
+                annotations.update(getattr(cls, "__annotations__", {}))
+            for name in annotations:
+                if name in data:
+                    value = data.pop(name)
+                else:
+                    value = self._field_default(name)
+                    if value is _MISSING:
+                        raise TypeError(f"missing required field: {name}")
+                    if isinstance(value, _DefaultFactory):
+                        value = value.build()
+                setattr(self, name, value)
+            for name, value in data.items():
+                setattr(self, name, value)
+
+        def dict(self) -> dict[str, Any]:
+            annotations: dict[str, Any] = {}
+            for cls in reversed(self.__class__.mro()):
+                annotations.update(getattr(cls, "__annotations__", {}))
+            return {name: getattr(self, name) for name in annotations}
+
+        def model_dump(self) -> dict[str, Any]:
+            return self.dict()
+
+        @classmethod
+        def _field_default(cls, name: str) -> Any:
+            for owner in cls.mro():
+                if name in owner.__dict__:
+                    return owner.__dict__[name]
+            return _MISSING
 
 
 class QueryRequest(BaseModel):
@@ -34,6 +88,36 @@ class QueryResponse(BaseModel):
     citations: list[Citation]
     guardrail_status: GuardrailStatus
     latency_ms: float
+
+
+class AgentToolInfo(BaseModel):
+    name: str
+    description: str
+
+
+class AgentExecutionStep(BaseModel):
+    step_id: str
+    tool_name: str
+    action: str
+    status: str = "planned"
+    reason: str | None = None
+    inputs: dict[str, Any] = Field(default_factory=dict)
+    output: dict[str, Any] | list[dict[str, Any]] | str | float | int | bool | None = None
+    error: str | None = None
+
+
+class AgentPlanRequest(QueryRequest):
+    include_outputs: bool = Field(default=False)
+
+
+class AgentPlanResponse(BaseModel):
+    domain: str
+    query: str
+    tools_available: list[AgentToolInfo]
+    steps: list[AgentExecutionStep]
+    final_answer: str | None = None
+    citations: list[Citation] = Field(default_factory=list)
+    latency_ms: float | None = None
 
 
 class ThresholdUpdateRequest(BaseModel):
