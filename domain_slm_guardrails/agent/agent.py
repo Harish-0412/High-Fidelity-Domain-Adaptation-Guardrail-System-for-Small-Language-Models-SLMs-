@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from domain_slm_guardrails.agent.tools import (
@@ -12,6 +12,11 @@ from domain_slm_guardrails.agent.tools import (
     QueryExpanderTool,
     RerankResultsTool,
     CheckGuardrailsTool
+)
+from domain_slm_guardrails.agent.planning import (
+    AgentPlan,
+    PlanGenerator,
+    Reflector
 )
 from domain_slm_guardrails.llm import OllamaClient, LLMConfig
 from domain_slm_guardrails.llm.prompts import PromptTemplates
@@ -27,10 +32,21 @@ class AgentStep:
 
 
 @dataclass
+class AgentState:
+    """State tracked during the agent's execution."""
+    query: str
+    current_plan: Optional[AgentPlan] = None
+    plan_step_index: int = 0
+    retrieved_chunks: list[dict] = field(default_factory=list)
+    revision_count: int = 0
+
+
+@dataclass
 class AgentResponse:
     answer: str
     steps: list[AgentStep]
     confidence: float
+    plan: Optional[AgentPlan] = None
 
 
 class MedicalRAGAgent:
@@ -52,34 +68,44 @@ class MedicalRAGAgent:
         self.registry.register(RerankResultsTool())
         self.registry.register(CheckGuardrailsTool())
 
+        # Initialize planning and reflection modules
+        self.plan_generator = PlanGenerator(self.llm)
+        self.reflector = Reflector(self.llm)
+
     def _decide_next_step(
         self,
-        query: str,
+        state: AgentState,
         conversation_history: list[AgentStep]
     ) -> Optional[tuple[str, dict, str]]:
         """
-        Ask the LLM what the next step should be.
+        Use the plan to decide the next step.
         Returns a tuple of (tool_name, tool_arguments, reasoning), or None if done.
         """
-        # First: always follow fixed plan to avoid loops
-        if not conversation_history:
-            return ("query_expander", {"query": query}, "Expand query first")
-        elif len(conversation_history) == 1:
-            last_step = conversation_history[-1]
-            if last_step.tool_result and last_step.tool_result.success and last_step.tool_result.data:
-                expanded_query = last_step.tool_result.data.get("expanded_query", query)
-            else:
-                expanded_query = query
-            return (
-                "search_retriever",
-                {"query": expanded_query, "top_k": 5},
-                "Search for relevant documents"
+        if not state.current_plan:
+            tools_desc = self.registry.get_tool_descriptions()
+            state.current_plan = self.plan_generator.generate_plan(
+                state.query,
+                tools_desc
             )
-        elif len(conversation_history) == 2:
-            # After search, we have retrieved chunks
+            state.plan_step_index = 0
+
+        if state.plan_step_index >= len(state.current_plan.steps):
             return None
-        else:
-            return None
+
+        current_plan_step = state.current_plan.steps[state.plan_step_index]
+
+        # Inject any missing arguments
+        arguments = current_plan_step.arguments.copy()
+        if not arguments.get("query"):
+            arguments["query"] = state.query
+
+        reasoning = f"Plan step {current_plan_step.step_number}: {current_plan_step.description}"
+
+        return (
+            current_plan_step.action,
+            arguments,
+            reasoning
+        )
 
     def _execute_step(
         self,
@@ -97,16 +123,17 @@ class MedicalRAGAgent:
     def answer_query(
         self,
         query: str,
-        max_steps: int = 5
+        max_steps: int = 10
     ) -> AgentResponse:
+        # Initialize agent state
+        state = AgentState(query=query)
         steps: list[AgentStep] = []
-        retrieved_chunks: list[dict] = []
-        current_query = query
         final_answer = ""
         confidence = 0.0
+        current_query = query
 
         for step_num in range(1, max_steps + 1):
-            decision = self._decide_next_step(current_query, steps)
+            decision = self._decide_next_step(state, steps)
             if decision is None:
                 break
 
@@ -122,7 +149,7 @@ class MedicalRAGAgent:
             ]:
                 tool_args["query"] = current_query
             if tool_name == "check_guardrails" and "retrieved_chunks" not in tool_args:
-                tool_args["retrieved_chunks"] = retrieved_chunks
+                tool_args["retrieved_chunks"] = state.retrieved_chunks
 
             result = self._execute_step(tool_name, tool_args)
             step = AgentStep(
@@ -133,18 +160,35 @@ class MedicalRAGAgent:
                 reasoning=reasoning
             )
             steps.append(step)
+            state.plan_step_index += 1
 
             # Capture data
             if tool_name == "search_retriever" and result.success:
-                retrieved_chunks = result.data or []
+                state.retrieved_chunks = result.data or []
             elif tool_name == "query_expander" and result.success and result.data:
                 current_query = result.data.get("expanded_query", current_query)
+                if "query" in tool_args:
+                    tool_args["query"] = current_query
             elif tool_name == "rerank_results" and result.success:
-                retrieved_chunks = result.data or []
+                state.retrieved_chunks = result.data or []
+
+            # Reflection after each step
+            if state.current_plan:
+                reflect_action, reflect_msg = self.reflector.reflect(
+                    state.plan_step_index,
+                    state.current_plan,
+                    steps,
+                    state.retrieved_chunks
+                )
+                if reflect_action == "revise" and state.revision_count < 2:
+                    state.revision_count += 1
+                    self.logger.info(f"Revising plan: {reflect_msg}")
+                    state.current_plan = None
+                    state.plan_step_index = 0
 
         # Generate final answer
-        if retrieved_chunks:
-            context = "\n".join([c.get("text", "") for c in retrieved_chunks[:3]])
+        if state.retrieved_chunks:
+            context = "\n".join([c.get("text", "") for c in state.retrieved_chunks[:3]])
             final_answer_prompt = f"""You are a medical prescription assistant. Answer the query using only this context:
 {context}
 
@@ -166,7 +210,7 @@ Your answer must be grounded in the context, cite your sources, and end with a s
         guardrails_result = guardrails_tool.execute(
             query=query,
             generated_response=final_answer,
-            retrieved_chunks=retrieved_chunks
+            retrieved_chunks=state.retrieved_chunks
         )
         if guardrails_result.success and guardrails_result.data:
             confidence = guardrails_result.data.get("confidence_score", confidence)
@@ -177,5 +221,6 @@ Your answer must be grounded in the context, cite your sources, and end with a s
         return AgentResponse(
             answer=final_answer,
             steps=steps,
-            confidence=confidence
+            confidence=confidence,
+            plan=state.current_plan
         )
